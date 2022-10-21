@@ -11,7 +11,21 @@ async function main() {
     const deployedFranceContract = await FranceContract.deploy()
     await deployedFranceContract.deployed()
     console.log('France Contract Address', deployedFranceContract.address)
+
+    //Deployment of the Brasil Token Smart Contract 
+    const BrasilContract = await ethers.getContractFactory('Brasil')
+    const deployedBrasilContract = await BrasilContract.deploy()
+    await deployedBrasilContract.deployed()
+    console.log('Brasil Contract Address', deployedBrasilContract.address)
+
+    //Deployment of the Swap Token Smart Contract 
+    const SwapContract = await ethers.getContractFactory('Swap')
+    const deployedSwapContract = await SwapContract.deploy(deployedFranceContract.address, deployedBrasilContract.address)
+    await deployedSwapContract.deployed()
+    console.log('Swap Contract Address', deployedSwapContract.address)
+
     await sleep(60000)
+
     //Verification on the Polygonscan Mumbai network
     await hre.run("verify:verify", {
         address: deployedFranceContract.address,
@@ -19,12 +33,6 @@ async function main() {
         contract: "contracts/Tokens.sol:France"
     });
 
-    //Deployment of the Brasil Token Smart Contract 
-    const BrasilContract = await ethers.getContractFactory('Brasil')
-    const deployedBrasilContract = await BrasilContract.deploy()
-    await deployedBrasilContract.deployed()
-    console.log('Brasil Contract Address', deployedBrasilContract.address)
-    await sleep(60000)
     //Verification on the Polygonscan Mumbai network
     await hre.run("verify:verify", {
         address: deployedBrasilContract.address,
@@ -32,20 +40,13 @@ async function main() {
         contract: "contracts/Tokens.sol:Brasil"
     });
 
-    //Deployment of the Swap Token Smart Contract 
-    const SwapContract = await ethers.getContractFactory('Swap')
-    const deployedSwapContract = await SwapContract.deploy(deployedFranceContract.address, deployedBrasilContract.address)
-    await deployedSwapContract.deployed()
-    console.log('Swap Contract Address', deployedSwapContract.address)
-    await sleep(60000)
     //Verification on the Polygonscan Mumbai network
     await hre.run("verify:verify", {
         address: deployedSwapContract.address,
-        constructorArguments: [],
+        constructorArguments: [deployedFranceContract.address, deployedBrasilContract.address],
         contract: "contracts/Swap.sol:Swap"
     });
 }
-
 
 main()
     .then(() => process.exit(0))

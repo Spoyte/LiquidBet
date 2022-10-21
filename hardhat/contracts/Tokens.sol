@@ -16,7 +16,7 @@ contract France is ERC20 {
     _mint(msg.sender, 10000 * 10**decimals());
   }
 
-  //@notice: Allow to mint more token when the user want to make a bet
+  //@notice: Allow to mint more token when the user want to make a bet.
   function mint(address _address, uint256 _amount) external {
     _mint(_address, _amount);
   }
