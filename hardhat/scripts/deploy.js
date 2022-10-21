@@ -34,7 +34,7 @@ async function main() {
 
     //Deployment of the Swap Token Smart Contract 
     const SwapContract = await ethers.getContractFactory('Swap')
-    const deployedSwapContract = await SwapContract.deploy(deployedFranceContract, deployedBrasilContract)
+    const deployedSwapContract = await SwapContract.deploy(deployedFranceContract.address, deployedBrasilContract.address)
     await deployedSwapContract.deployed()
     console.log('Swap Contract Address', deployedSwapContract.address)
     await sleep(60000)
