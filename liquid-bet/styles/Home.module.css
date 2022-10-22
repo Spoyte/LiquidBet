@@ -1,0 +1,42 @@
+.navbar {
+  display: flex;
+  background-color: #FD841F;
+  justify-content: space-between;
+  padding: 10px;
+  align-items: center;
+}
+.footer {
+  display: flex;
+  background-color: #FD841F;
+  justify-content: space-between;
+  padding: 10px;
+  align-items: center;
+}
+.connect {
+  
+}
+.container {
+  height: 100vh;
+  background-color: #ff000090;
+}
+
+
+@media (max-width: 600px) {
+  .grid {
+    width: 100%;
+    flex-direction: column;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .card,
+  .footer {
+    border-color: #222;
+  }
+  .code {
+    background: #111;
+  }
+  .logo img {
+    filter: invert(1);
+  }
+}
