@@ -4,6 +4,8 @@
   justify-content: space-between;
   padding: 10px;
   align-items: center;
+  font-family: 'Kodchasan', sans-serif;
+  border-bottom: 1px solid black;
 }
 .footer {
   display: flex;
@@ -11,13 +13,35 @@
   justify-content: space-between;
   padding: 10px;
   align-items: center;
+  font-family: 'Kodchasan', sans-serif;
+  border-top: 1px solid black;
+
 }
-.connect {
-  
+
+.logo {
+  display: flex;
+  align-items: center;
 }
 .container {
-  height: 100vh;
-  background-color: #ff000090;
+  height: 80vh;
+}
+.socials> img {
+  margin: 2px;
+
+}
+.topmatch {
+  border: 1px solid black;
+  background-color: #FFA3A3;
+  padding: 5px;
+  margin: 15px;
+  border-radius: 5px;
+}
+.bets {
+  border: 1px solid black;
+  background-color: #FFA3A3;
+  padding: 5px;
+  margin: 15px;
+  border-radius: 5px;
 }
 
 
