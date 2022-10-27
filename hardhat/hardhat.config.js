@@ -12,7 +12,14 @@ module.exports = {
     mumbai: {
       url: NODE_PROVIDER_API_KEY_URL,
       accounts: [WALLET_PRIVATE_KEY],
-      // gasPrice: 1000000,
+      gas: 2100000,
+      gasPrice: 8000000000
+    },
+    testnet: {
+      url: "http://127.0.0.1:8545/",
+      accounts: [WALLET_PRIVATE_KEY],
+      gas: 2100000,
+      gasPrice: 8000000000
     }
   },
   etherscan: {
