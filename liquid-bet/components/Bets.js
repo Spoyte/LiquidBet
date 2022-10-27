@@ -5,11 +5,11 @@ const Bets = () => {
         <div className={styles.bets}>
             <p className={styles.title}>BETSLIP</p>
             <div className={styles.slipdetails}>
-                <p>France - Brasil</p>
+                <p className={styles.teamname}>France - Brasil</p>
                 <p>Full Time Result</p>
                 <p><span>1</span><span className={styles.slipOdds}>3.20</span></p>
             </div>
-            <p className={styles.betAmount}>Bet Amount - 2MATIC</p>
+            <p className={styles.betAmount}>Bet Amount <span>2MATIC</span></p>
             <button className={styles.betBTN}>PLACE BET</button>
         </div>
       );
