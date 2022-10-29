@@ -20,6 +20,11 @@ contract Swap is ERC20, Ownable {
   //Will be send a value at the end of the match.
   uint256 FinalResult = 0;
 
+  //Testing the Logic without the need of an API
+  function setFinalResult(uint256 _number) public {
+    FinalResult = _number;
+  }
+
   /*
    *@notice: Constructor.
    *@dev: Implement the two tokens contracts address at deployment.
@@ -60,7 +65,6 @@ contract Swap is ERC20, Ownable {
     uint256 balanceBrasilToken = ERC20(BrasilTokenAddress).balanceOf(
       msg.sender
     );
-
     return (balanceFranceToken, balanceBrasilToken);
   }
 
@@ -93,13 +97,7 @@ contract Swap is ERC20, Ownable {
    *@dev: Allow the user to deposit some ETH/Matic
    *@dev: Mint some tokens in the User's wallet.
    */
-  function deposit(uint256 _amount) public payable {
-    uint256 _amountInWei = (_amount * 1e18);
-    (bool success, ) = address(this).call{ value: _amountInWei }("");
-    require(success, "Deposit coudn't succeed");
-    France(FranceTokenAddress).mint(msg.sender, _amount);
-    Brasil(BrasilTokenAddress).mint(msg.sender, _amount);
-  }
+  function deposit() public payable {}
 
   /*
    *@notice: Allow the User to bet on one team (2/3).
@@ -110,7 +108,7 @@ contract Swap is ERC20, Ownable {
     ERC20(BrasilTokenAddress).transferFrom(
       msg.sender,
       address(this),
-      _braAmount
+      _braAmount * 1e18
     );
   }
 
@@ -118,7 +116,7 @@ contract Swap is ERC20, Ownable {
     ERC20(FranceTokenAddress).transferFrom(
       msg.sender,
       address(this),
-      _frAmount
+      _frAmount * 1e18
     );
   }
 

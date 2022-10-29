@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 /*
 *@Author: Paul Birnbaum.
 
-*@title: France Token. 
+*@title: France Token . 
 *@notice: Creation of the France Token.
 *@dev: Will create 10000 tokens and can mint more later.
 */
@@ -46,7 +46,7 @@ contract France is ERC20 {
 }
 
 /*
- *@title: Brasil Token.
+ *@title: Brasil Token .
  *@notice: Creation of the Brasil Token.
  *@dev: Will create 10000 tokens and can mint more later.
  */
