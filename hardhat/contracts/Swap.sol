@@ -93,7 +93,7 @@ contract Swap is ERC20, Ownable {
    *@dev: Allow the user to deposit some ETH/Matic
    *@dev: Mint some tokens in the User's wallet.
    */
-  function deposit(uint256 _amount) public payable {
+  function deposit() public payable {
     require(msg.value > 0, "You didn't provide any funds");
     France(FranceTokenAddress).mint(msg.sender, _amount);
     Brasil(BrasilTokenAddress).mint(msg.sender, _amount);
