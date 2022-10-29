@@ -94,9 +94,7 @@ contract Swap is ERC20, Ownable {
    *@dev: Mint some tokens in the User's wallet.
    */
   function deposit(uint256 _amount) public payable {
-    uint256 _amountInWei = (_amount * 1e18);
-    (bool success, ) = address(this).call{ value: _amountInWei }("");
-    require(success, "Deposit coudn't succeed");
+    require(msg.value > 0, "You didn't provide any funds");
     France(FranceTokenAddress).mint(msg.sender, _amount);
     Brasil(BrasilTokenAddress).mint(msg.sender, _amount);
   }
