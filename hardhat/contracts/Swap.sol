@@ -95,8 +95,8 @@ contract Swap is ERC20, Ownable {
    */
   function deposit() public payable {
     require(msg.value > 0, "You didn't provide any funds");
-    France(FranceTokenAddress).mint(msg.sender, _amount);
-    Brasil(BrasilTokenAddress).mint(msg.sender, _amount);
+    France(FranceTokenAddress).mint(msg.sender, msg.value);
+    Brasil(BrasilTokenAddress).mint(msg.sender, msg.value);
   }
 
   /*
