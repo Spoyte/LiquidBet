@@ -2,9 +2,82 @@ import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import TopMatch from '../components/TopMatch'
 import Bets from '../components/Bets'
+import { BRAZIL_TOKEN_ABI, 
+  BRAZIL_TOKEN_ADDRESS, 
+  FRANCE_TOKEN_ADDRESS, 
+  FRANCE_TOKEN_ABI, 
+  SWAP_CONTRACT_ADDRESS, 
+  SWAP_CONTRACT_ABI
+} from "../constants"
+import { useAccount, useContract, useContractRead, useContractWrite, usePrepareContractWrite } from 'wagmi';
+import { useState, useEffect } from 'react'
+import { useIsMounted } from '../hooks/useIsMounted'
+import { useSigner } from 'wagmi'
+import { Writer } from '@ethersproject/abi/lib/coders/abstract-coder'
+import { parseEther } from 'ethers/lib/utils'
+import { BigNumber, ethers, utils } from 'ethers'
+
 
 
 export default function Home() {
+  const { data: signer, isError, isLoading }= useSigner();
+  const mounted = useIsMounted()
+  const { address } = useAccount();
+  const [lptokens, setLpTokens] = useState('');
+  const [balanceWallet, setBalanceWallet] = useState();
+  const [title, setTitle] = useState('0.00002')
+  const newTitle = BigNumber.from(utils.parseEther(title))._hex
+  
+// const x = parseEther('2')._hex
+const y = BigNumber.from(utils.parseEther('3'))._hex
+
+console.log(y)
+  // BigNumber.from(utils.parseEther(
+    
+
+ 
+
+  //approve contract to use FRA and BRA tokens
+  
+  const { config: brazilConfig }  = usePrepareContractWrite({
+      address: BRAZIL_TOKEN_ADDRESS,
+      abi: BRAZIL_TOKEN_ABI,
+      functionName: "approve",
+      args: [SWAP_CONTRACT_ADDRESS, 10000000],
+      
+    })
+    const { write: brazilWrite } = useContractWrite(brazilConfig);
+  
+
+    const { config: franceConfig }  = usePrepareContractWrite({
+      address: BRAZIL_TOKEN_ADDRESS,
+      abi: BRAZIL_TOKEN_ABI,
+      functionName: "approve",
+      args: [SWAP_CONTRACT_ADDRESS, 10000000],
+      
+    })
+    const { write: franceWrite  } = useContractWrite(franceConfig)
+    
+  //   const { config } = usePrepareContractWrite({
+  //     address: SWAP_CONTRACT_ADDRESS,
+  //     abi: SWAP_CONTRACT_ABI,
+  //     functionName: "deposit",
+  //     args: [0.00002]
+  //   })
+
+  //   const { write } = useContractWrite(config)
+  // write()
+  const { config }  = usePrepareContractWrite({
+    address: SWAP_CONTRACT_ADDRESS,
+    abi: SWAP_CONTRACT_ABI,
+    functionName: "deposit",
+    args: [1000, 299]
+  })
+  
+  const { write } = useContractWrite(config)
+  console.log(write)
+  const p = ethers.BigNumber.from(1990)
+console.log(p)
   return (
     <div className={styles.container}>
       <Head>
@@ -13,6 +86,27 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div>
+        <button className={styles.approve} onClick={() => {
+          brazilWrite()
+          franceWrite()}}>
+          Approve
+        </button>
+        <div>
+          <p>Deposit Matic to place Bets</p>
+          <form>
+            <input
+              type='number'
+              title="Amount of MATIC to deposit"
+              placeholder='Enter MATIC amount to Deposit'
+              onChange={e => setTitle(e.target.value)}
+              value={title}
+            />
+            <button onClick={(e) => {
+              e.preventDefault()
+              setTitle() 
+               }}>Deposit</button>
+          </form>
+        </div>
         
         <TopMatch/>
         <Bets/>

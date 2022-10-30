@@ -10,6 +10,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 *@title: France Token. 
 *@notice: Creation of the France Token.
 *@dev: Will create 10000 tokens and can mint more later.
+extra comment
 */
 contract France is ERC20 {
   constructor() ERC20("France", "FR") {

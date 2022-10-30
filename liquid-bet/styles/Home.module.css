@@ -1,11 +1,18 @@
 .navbar {
   display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   background-color: #FD841F;
   justify-content: space-between;
   padding: 10px;
   align-items: center;
   font-family: 'Kodchasan', sans-serif;
   border-bottom: 1px solid black;
+}
+.container{
+  margin-top: 14%;
 }
 .footer {
   display: flex;
@@ -39,7 +46,18 @@
   font-weight: bolder;
   font-size: 20px;
 }
-
+.approve{
+  padding: 5px 15px;
+  background-color: rgb(97, 174, 97);
+  border: 1px solid black;
+  outline: none;
+  margin-top: 1px;
+  margin-right: 5%;
+  float: right;
+  
+  font-weight: bold;
+  border-radius: 7px;
+}
 .bets {
   border: 1px solid black;
   background-color: #FFA3A3;
