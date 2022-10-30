@@ -4,6 +4,7 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./Tokens.sol";
+import "hardhat/console.sol";
 
 /*
 *@Author: Paul Birnbaum.
@@ -16,14 +17,9 @@ contract Swap is ERC20, Ownable {
   address public FranceTokenAddress;
   address public BrasilTokenAddress;
 
-  //Will be 1 for France win, 2 for Draw and 3 for Brasil's win.
-  //Will be send a value at the end of the match.
-  uint256 FinalResult = 0;
-
-  //Testing the Logic without the need of an API
-  function setFinalResult(uint256 _number) public {
-    FinalResult = _number;
-  }
+  event FranceBalanceWallet(uint256);
+  event BrasilBalanceWallet(uint256);
+  event thoughtThis(string);
 
   /*
    *@notice: Constructor.
@@ -58,14 +54,18 @@ contract Swap is ERC20, Ownable {
    *@notice: Public function that show the balance of Tokens in the User's Wallet
    *@return: Balance of the France and Brasil Token in the User's Wallet.
    */
-  function getBalanceWallet() public view returns (uint256, uint256) {
+  function getBalanceWalletFrance() public view returns (uint256) {
     uint256 balanceFranceToken = ERC20(FranceTokenAddress).balanceOf(
       msg.sender
     );
+    return (balanceFranceToken);
+  }
+
+  function getBalanceWalletBrasil() public view returns (uint256) {
     uint256 balanceBrasilToken = ERC20(BrasilTokenAddress).balanceOf(
       msg.sender
     );
-    return (balanceFranceToken, balanceBrasilToken);
+    return (balanceBrasilToken);
   }
 
   function ownTokenContracts() public onlyOwner {
@@ -78,7 +78,10 @@ contract Swap is ERC20, Ownable {
    *@dev: This function is restricted to the Owner of the Contract.
    *@dev: Need to approve the Contract address from each Tokens Contract before calling the function.
    */
+
+  //Eth
   function addLiquidity(uint256 _amount) public onlyOwner {
+    _amount *= 1e18;
     ERC20(FranceTokenAddress).transferFrom(msg.sender, address(this), _amount);
     ERC20(BrasilTokenAddress).transferFrom(msg.sender, address(this), _amount);
   }
@@ -98,24 +101,35 @@ contract Swap is ERC20, Ownable {
    *@dev: Mint some tokens in the User's wallet.
    */
 
+  //eth
+  function deposit() public payable {
+    require(msg.value > 0, "You didn't provide any funds");
+    France(FranceTokenAddress).mint(msg.sender, msg.value);
+    Brasil(BrasilTokenAddress).mint(msg.sender, msg.value);
+  }
+
   /*
    *@notice: Allow the User to bet on one team (2/3).
    *@dev: Allow the User to deposit some of the unwanted token for a swap.
    *@dev: Need to approve the Contract address from each Tokens Contract before calling the function.
    */
+  //Wei
   function sendBRAToken(uint256 _braAmount) public {
+    _braAmount *= 1e18;
     ERC20(BrasilTokenAddress).transferFrom(
       msg.sender,
       address(this),
-      _braAmount * 1e18
+      _braAmount
     );
   }
 
+  //Wei
   function sendFRToken(uint256 _frAmount) public {
+    _frAmount *= 1e18;
     ERC20(FranceTokenAddress).transferFrom(
       msg.sender,
       address(this),
-      _frAmount * 1e18
+      _frAmount
     );
   }
 
@@ -125,6 +139,7 @@ contract Swap is ERC20, Ownable {
    */
 
   function receivedFrToken(uint256 _braAmount) public {
+    _braAmount *= 1e18;
     uint256 franceTokenReserve = getReserveFrance();
     uint256 brasilTokenReserve = getReserveBrasil();
     uint256 frReturn = (_braAmount * franceTokenReserve) /
@@ -134,6 +149,8 @@ contract Swap is ERC20, Ownable {
   }
 
   function receivedBraToken(uint256 _frAmount) public {
+    _frAmount *= 1e18;
+
     uint256 franceTokenReserve = getReserveFrance();
     uint256 brasilTokenReserve = getReserveBrasil();
     uint256 braReturn = (_frAmount * brasilTokenReserve) /
@@ -142,17 +159,30 @@ contract Swap is ERC20, Ownable {
     ERC20(BrasilTokenAddress).transfer(msg.sender, braReturn);
   }
 
+  //Will be 1 for France win, 2 for Draw and 3 for Brasil's win.
+  //Will be send a value at the end of the match.
+  uint256 public FinalResult = 1;
+
+  // Allow us to test the final result before connecting to the Chainlink Node
+  function setFinalResult(uint256 _winner) public {
+    FinalResult = _winner;
+  }
+
   /*
    *@notice: Send back the Token and Swap it for some ETH/MATIC If the User wins his bet.
    *@notice: Send back the token but don't swap it If he losses.
    *@dev: Function to be call when the game is over.
    */
 
-  function gameOver() public {
+  function gameOver() public returns (uint256, uint256) {
     require(FinalResult > 0, "The match is not finish yet");
 
-    (uint256 balanceFranceToken, ) = getBalanceWallet();
-    (, uint256 balanceBrasilToken) = getBalanceWallet();
+    emit thoughtThis("hello");
+    uint256 balanceFranceToken = getBalanceWalletFrance();
+  
+    uint256 balanceBrasilToken = getBalanceWalletBrasil();
+    emit BrasilBalanceWallet(balanceBrasilToken);
+
 
     if (FinalResult == 1) {
       ERC20(FranceTokenAddress).transferFrom(
@@ -160,30 +190,34 @@ contract Swap is ERC20, Ownable {
         address(this),
         balanceFranceToken
       );
+      emit thoughtThis("Pass here");
       payable(msg.sender).transfer(balanceFranceToken);
-    } else if (FinalResult == 3) {
-      ERC20(BrasilTokenAddress).transferFrom(
-        msg.sender,
-        address(this),
-        balanceBrasilToken
-      );
-      payable(msg.sender).transfer(balanceBrasilToken);
-    } else if (FinalResult == 2) {
-      ERC20(FranceTokenAddress).transferFrom(
-        msg.sender,
-        address(this),
-        balanceFranceToken
-      );
-      ERC20(BrasilTokenAddress).transferFrom(
-        msg.sender,
-        address(this),
-        balanceBrasilToken
-      );
-      payable(msg.sender).transfer(
-        (balanceFranceToken + balanceBrasilToken) / 2
-      ); //Experimental...
     }
+    // else if (FinalResult == 3) {
+    //   ERC20(BrasilTokenAddress).transferFrom(
+    //     msg.sender,
+    //     address(this),
+    //     balanceBrasilToken
+    //   );
+    //   payable(msg.sender).transfer(balanceBrasilToken);
+    // } else if (FinalResult == 2) {
+    //   ERC20(FranceTokenAddress).transferFrom(
+    //     msg.sender,
+    //     address(this),
+    //     balanceFranceToken
+    //   );
+    //   ERC20(BrasilTokenAddress).transferFrom(
+    //     msg.sender,
+    //     address(this),
+    //     balanceBrasilToken
+    //   );
+    //   payable(msg.sender).transfer(
+    //     (balanceFranceToken + balanceBrasilToken) / 2
+    //   ); //Experimental...
+    // }
 
-    assert(FinalResult > 3);
+    return (balanceFranceToken, balanceBrasilToken);
   }
+
+  // 0xde12A52cd5AB09b995404f7145A77b621eB5946cd8et
 }
