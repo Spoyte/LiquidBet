@@ -37,9 +37,16 @@ async function main() {
     console.log("");
 
 
+
+
+
+    /////////////////////////////////////////////////////
+    // Calling the functions after contracts are deployed //
+    //////////////////////////////////////////////////// 
+
     const NODE_PROVIDER_API_KEY_URL = process.env.NODE_PROVIDER_API_KEY_URL;
     const WALLET_PRIVATE_KEY = process.env.WALLET_PRIVATE_KEY;
-
+    // Connnecting the Wallet  
     const provider = new ethers.providers.JsonRpcProvider(NODE_PROVIDER_API_KEY_URL)
     const wallet = new ethers.Wallet(WALLET_PRIVATE_KEY)
     const signer = wallet.connect(provider)
@@ -50,7 +57,7 @@ async function main() {
         signer
     )
 
-
+    // Initialyse the Ownership of the Tokens Contracts to the Swap Contract.
     try {
         let tx = await _swapContract.ownTokenContracts({ gasLimit: 5000000 })
         // provider.estimateGas(tx).then((gasLimit) => {});
@@ -62,12 +69,17 @@ async function main() {
         console.log(error);
     }
 
+    //Amount to set in approve() function.
     const weiApprove = "10000000000000000000000000000"
-
-    const franceABI = france.abi;
-    const brasilABI = brasil.abi;
+    //Amount that the user is willing to bet.
     const maticAmount = "1000000000000000000";
 
+    // Tokens Contracts ABI
+    const franceABI = france.abi;
+    const brasilABI = brasil.abi;
+
+
+    // Approval from the Tokens Contracts 
     try {
         const _franceContract = new Contract(
             deployedFranceContract.address,
