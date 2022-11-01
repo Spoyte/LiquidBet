@@ -17,9 +17,12 @@ contract Swap is ERC20, Ownable {
   address public FranceTokenAddress;
   address public BrasilTokenAddress;
 
+  // mapping (address => uint) balance;
+
   event FranceBalanceWallet(uint256);
   event BrasilBalanceWallet(uint256);
   event thoughtThis(string);
+  event Initialization(address sender, uint256 time);
 
   /*
    *@notice: Constructor.
@@ -30,6 +33,7 @@ contract Swap is ERC20, Ownable {
   {
     FranceTokenAddress = _FranceTokenAddress;
     BrasilTokenAddress = _BrasilTokenAddress;
+    console.log("Contract Deployed");
   }
 
   /*
@@ -38,7 +42,8 @@ contract Swap is ERC20, Ownable {
    */
   function getReserveFrance() public view returns (uint256) {
     uint256 FranceReserve = ERC20(FranceTokenAddress).balanceOf(address(this));
-    return (FranceReserve);
+    //Result in Eth
+    return (FranceReserve / 1e18);
   }
 
   /*
@@ -47,7 +52,8 @@ contract Swap is ERC20, Ownable {
    */
   function getReserveBrasil() public view returns (uint256) {
     uint256 BrasilReserve = ERC20(BrasilTokenAddress).balanceOf(address(this));
-    return (BrasilReserve);
+    //Result in Eth
+    return (BrasilReserve / 1e18);
   }
 
   /*
@@ -58,14 +64,16 @@ contract Swap is ERC20, Ownable {
     uint256 balanceFranceToken = ERC20(FranceTokenAddress).balanceOf(
       msg.sender
     );
-    return (balanceFranceToken);
+    //Result in Eth
+    return (balanceFranceToken / 1e15);
   }
 
   function getBalanceWalletBrasil() public view returns (uint256) {
     uint256 balanceBrasilToken = ERC20(BrasilTokenAddress).balanceOf(
       msg.sender
     );
-    return (balanceBrasilToken);
+    //Result in Eth
+    return (balanceBrasilToken / 1e15);
   }
 
   function ownTokenContracts() public onlyOwner {
@@ -115,7 +123,7 @@ contract Swap is ERC20, Ownable {
    */
   //Wei
   function sendBRAToken(uint256 _braAmount) public {
-    _braAmount *= 1e18;
+    // _braAmount *= 1e18;
     ERC20(BrasilTokenAddress).transferFrom(
       msg.sender,
       address(this),
@@ -139,7 +147,7 @@ contract Swap is ERC20, Ownable {
    */
 
   function receivedFrToken(uint256 _braAmount) public {
-    _braAmount *= 1e18;
+    // _braAmount *= 1e18;
     uint256 franceTokenReserve = getReserveFrance();
     uint256 brasilTokenReserve = getReserveBrasil();
     uint256 frReturn = (_braAmount * franceTokenReserve) /
@@ -159,6 +167,15 @@ contract Swap is ERC20, Ownable {
     ERC20(BrasilTokenAddress).transfer(msg.sender, braReturn);
   }
 
+
+  function balance() public view returns(uint) {
+  return ((msg.sender.balance) / 1e14) ;
+  }
+
+  function contractBalance() public view returns(uint) {
+    return address(this).balance / 1e14;
+  }
+
   //Will be 1 for France win, 2 for Draw and 3 for Brasil's win.
   //Will be send a value at the end of the match.
   uint256 public FinalResult = 1;
@@ -167,22 +184,22 @@ contract Swap is ERC20, Ownable {
   function setFinalResult(uint256 _winner) public {
     FinalResult = _winner;
   }
+  
 
   /*
    *@notice: Send back the Token and Swap it for some ETH/MATIC If the User wins his bet.
    *@notice: Send back the token but don't swap it If he losses.
    *@dev: Function to be call when the game is over.
    */
+  
+  
 
-  function gameOver() public returns (uint256, uint256) {
+  function gameOver() public {
     require(FinalResult > 0, "The match is not finish yet");
 
-    emit thoughtThis("hello");
-    uint256 balanceFranceToken = getBalanceWalletFrance();
-  
-    uint256 balanceBrasilToken = getBalanceWalletBrasil();
-    emit BrasilBalanceWallet(balanceBrasilToken);
 
+    uint256 balanceFranceToken = getBalanceWalletFrance();
+    // uint256 balanceBrasilToken = getBalanceWalletBrasil();
 
     if (FinalResult == 1) {
       ERC20(FranceTokenAddress).transferFrom(
@@ -190,9 +207,18 @@ contract Swap is ERC20, Ownable {
         address(this),
         balanceFranceToken
       );
-      emit thoughtThis("Pass here");
-      payable(msg.sender).transfer(balanceFranceToken);
     }
+  }
+
+  function backMoney() public  {
+    uint256 balanceFranceToken = getBalanceWalletFrance();
+    if(FinalResult == 1){
+      payable(msg.sender).transfer(balanceFranceToken);
+      
+    }
+  }
+
+    
     // else if (FinalResult == 3) {
     //   ERC20(BrasilTokenAddress).transferFrom(
     //     msg.sender,
@@ -216,8 +242,8 @@ contract Swap is ERC20, Ownable {
     //   ); //Experimental...
     // }
 
-    return (balanceFranceToken, balanceBrasilToken);
-  }
+    // return (balanceFranceToken, balanceBrasilToken);
+  
 
   // 0xde12A52cd5AB09b995404f7145A77b621eB5946cd8et
 }

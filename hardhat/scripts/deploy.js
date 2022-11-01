@@ -1,18 +1,20 @@
 const { ethers } = require('hardhat')
+const ether = require('ethers');
+require("@nomiclabs/hardhat-ethers");
 require('dotenv').config({ path: '.env' });
 const swap = require("../artifacts/contracts/Swap.sol/Swap.json")
 const france = require("../artifacts/contracts/Tokens.sol/France.json")
 const brasil = require("../artifacts/contracts/Tokens.sol/Brasil.json")
 
-const { Contract } = require("ethers")
+const { Contract, BigNumber } = require("ethers")
 
 //Deployment of the 3 Smart Contracts
 async function main() {
 
-
-
     // Wait/Sleep function
     const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
+
 
     //Deployment of the France Token Smart Contract 
     console.log("");
@@ -38,41 +40,57 @@ async function main() {
 
 
 
-
-
-    /////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////
     // Calling the functions after contracts are deployed //
-    //////////////////////////////////////////////////// 
+    ///////////////////////////////////////////////////////
 
     const NODE_PROVIDER_API_KEY_URL = process.env.NODE_PROVIDER_API_KEY_URL;
     const WALLET_PRIVATE_KEY = process.env.WALLET_PRIVATE_KEY;
+
+
     // Connnecting the Wallet  
     const provider = new ethers.providers.JsonRpcProvider(NODE_PROVIDER_API_KEY_URL)
     const wallet = new ethers.Wallet(WALLET_PRIVATE_KEY)
     const signer = wallet.connect(provider)
     const swapABI = swap.abi;
-    const _swapContract = new Contract(
+    const _swapContract = new ethers.Contract(
         deployedSwapContract.address,
         swapABI,
         signer
     )
 
+
+    //Doesn't Work for now 
+    const checkEvents = () => {
+        _swapProviderContract.on("Initialization", (sender, event) => {
+            console.log({
+                sender: sender,
+                data: event
+            });
+        })
+    }
+
+
+
+
     // Initialyse the Ownership of the Tokens Contracts to the Swap Contract.
     try {
         let tx = await _swapContract.ownTokenContracts({ gasLimit: 5000000 })
+
         // provider.estimateGas(tx).then((gasLimit) => {});
         await tx.wait();
         console.log("Tokens owns by the Swap Contract ");
         console.log("");
-
     } catch (error) {
         console.log(error);
     }
 
+
+
     //Amount to set in approve() function.
-    const weiApprove = "10000000000000000000000000000"
-    //Amount that the user is willing to bet.
-    const maticAmount = "1000000000000000000";
+    const weiApprove = "10000000000000000000000000000";
+    //Amount that the user is willing to bet in WEI .
+    const maticAmount = "100000000000000000000";
 
     // Tokens Contracts ABI
     const franceABI = france.abi;
@@ -81,11 +99,7 @@ async function main() {
 
     // Approval from the Tokens Contracts 
     try {
-        const _franceContract = new Contract(
-            deployedFranceContract.address,
-            franceABI,
-            signer
-        )
+        const _franceContract = new Contract(deployedFranceContract.address, franceABI, signer)
         let tx = await _franceContract.approve(deployedSwapContract.address, weiApprove, { gasLimit: 5000000 })
         await tx.wait();
 
@@ -97,11 +111,7 @@ async function main() {
     }
 
     try {
-        const _brasilContract = new Contract(
-            deployedBrasilContract.address,
-            brasilABI,
-            signer
-        )
+        const _brasilContract = new Contract(deployedBrasilContract.address, brasilABI, signer)
         let tx = await _brasilContract.approve(deployedSwapContract.address, weiApprove, { gasLimit: 5000000 })
         await tx.wait();
         console.log("Msg.sender approved by Brasil Token");
@@ -121,64 +131,133 @@ async function main() {
     } catch (error) {
         console.log(error);
     }
+
+
+    //callStatic is used to Read data from a "view" function
     try {
+        let tx = await _swapContract.callStatic.getReserveFrance()
+        console.log(`There is ${tx.toNumber()} France Tokens in the Pool`);
+        tx = await _swapContract.callStatic.getReserveBrasil()
+        console.log(`There is ${tx.toNumber()} Brasil Tokens in the Pool`)
+    } catch (error) {
+        console.log(error);
+    }
+    try {
+        let _swapContract = new ethers.Contract(
+            deployedSwapContract.address,
+            swapABI,
+            signer
+        )
 
         let tx = await _swapContract.deposit({
             value: maticAmount,
             gasLimit: 5000000
         })
-        await tx.wait();
-
         console.log("Deposit made");
         console.log("");
-        tx = await _swapContract.sendBRAToken(maticAmount / 1e18, { gasLimit: 5000000 })
+        tx = await _swapContract.sendBRAToken(maticAmount, { gasLimit: 5000000 })
         await tx.wait();
-        console.log("Bra token sent to the Pool");
+        console.log(`${ether.utils.formatEther(maticAmount)} Bra token send to the Pool`);
         console.log("");
-        tx = await _swapContract.receivedFrToken(maticAmount / 1e18, { gasLimit: 5000000 })
+        tx = await _swapContract.receivedFrToken(maticAmount, { gasLimit: 5000000 })
         await tx.wait();
-        console.log("Fr tokens received from the Pool");
+        console.log(`${ether.utils.formatEther(maticAmount)} Fr tokens received from the Pool`);
         console.log("");
+        await tx.wait();
+    } catch (error) {
+        console.log(error);
+    }
 
+
+
+    try {
+        let tx = await _swapContract.callStatic.getReserveFrance()
+        console.log(`There is ${tx.toNumber()} France Tokens in the Pool`);
+        tx = await _swapContract.callStatic.getReserveBrasil()
+        console.log(`There is  ${tx.toNumber()} Brasil Tokens in the Pool`)
+        tx = await _swapContract.callStatic.getBalanceWalletFrance()
+        console.log(`You have ${tx.toNumber()} France Tokens in your wallet`)
+        tx = await _swapContract.callStatic.getBalanceWalletBrasil()
+        console.log(`You have ${tx.toNumber()} Brasil Tokens in your wallet`)
+
+
+
+    } catch (error) {
+        console.log(error);
+    }
+    try {
+        let tx = await _swapContract.callStatic.contractBalance()
+        console.log(`There is ${tx.toNumber()} Matic in the Contract`);
+
+    } catch (error) {
+        console.log(error);
+    }
+    try {
+        let tx = await _swapContract.callStatic.balance()
+        console.log(`You have ${tx.toNumber()} Matic in your Wallet`);
 
     } catch (error) {
         console.log(error);
     }
 
 
-    // try {
-    //     let tx = await _swapContract.gameOver({ gasLimit: 5000000 })
-    //     await tx.wait();
-    //     console.log("Game Over");
-    //     console.log("");
+    try {
+        let tx = await _swapContract.gameOver({ gasLimit: 5000000 })
+        await tx.wait();
+        console.log("Game Over");
+        console.log("");
 
 
-    // } catch (error) {
-    //     console.log(error);
-    // }
+    } catch (error) {
+        console.log(error);
+    }
+    try {
+        let tx = await _swapContract.backMoney()
+        await tx.wait();
+        console.log("BackMoney Call");
 
-    //     await sleep(30000)
+    } catch (error) {
+        console.log(error);
+    }
 
-    //Verification on the Polygonscan Mumbai network
-    //     await hre.run("verify:verify", {
-    //         address: deployedFranceContract.address,
-    //         constructorArguments: [],
-    //         contract: "contracts/Tokens.sol:France"
-    //     });
+    try {
+        let tx = await _swapContract.callStatic.balance()
+        console.log(`You have ${tx.toNumber()} Matic in your Wallet`);
 
-    //Verification on the Polygonscan Mumbai network
-    //     await hre.run("verify:verify", {
-    //         address: deployedBrasilContract.address,
-    //         constructorArguments: [],
-    //         contract: "contracts/Tokens.sol:Brasil"
-    //     });
+    } catch (error) {
+        console.log(error);
+    }
+    try {
+        let tx = await _swapContract.callStatic.contractBalance()
+        console.log(`There is ${tx.toNumber()} Matic in the Contract`);
 
-    //Verification on the Polygonscan Mumbai network
-    //     await hre.run("verify:verify", {
-    //         address: deployedSwapContract.address,
-    //         constructorArguments: [deployedFranceContract.address, deployedBrasilContract.address],
-    //         contract: "contracts/Swap.sol:Swap"
-    //     });
+    } catch (error) {
+        console.log(error);
+    }
+
+
+    // //     await sleep(30000)
+
+    // //Verification on the Polygonscan Mumbai network
+    // //     await hre.run("verify:verify", {
+    // //         address: deployedFranceContract.address,
+    // //         constructorArguments: [],
+    // //         contract: "contracts/Tokens.sol:France"
+    // //     });
+
+    // //Verification on the Polygonscan Mumbai network
+    // //     await hre.run("verify:verify", {
+    // //         address: deployedBrasilContract.address,
+    // //         constructorArguments: [],
+    // //         contract: "contracts/Tokens.sol:Brasil"
+    // //     });
+
+    // //Verification on the Polygonscan Mumbai network
+    // //     await hre.run("verify:verify", {
+    // //         address: deployedSwapContract.address,
+    // //         constructorArguments: [deployedFranceContract.address, deployedBrasilContract.address],
+    // //         contract: "contracts/Swap.sol:Swap"
+    // //     });
 
 
 }
