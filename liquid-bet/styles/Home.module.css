@@ -75,9 +75,9 @@
   align-self: center;
 }
 .slipdetails{
-  background-color: rgb(177, 177, 177);
+  background-color: #719bfd;
   padding: 7px;
-  border: 2px solid rgb(54, 54, 54);
+  border: 1px solid rgb(54, 54, 54);
   border-radius: 7px;
 }
 .slipOdds {
@@ -150,7 +150,6 @@
   font-weight: bolder;
 }
 .depositContainer {
-  border: 1px solid black;
   padding: 10px;
   font-weight: 100;
   font-size: medium;
