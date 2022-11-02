@@ -43,7 +43,7 @@ contract Swap is ERC20, Ownable {
   function getReserveFrance() public view returns (uint256) {
     uint256 FranceReserve = ERC20(FranceTokenAddress).balanceOf(address(this));
     //Result in Eth
-    return (FranceReserve / 1e18);
+    return (FranceReserve);
   }
 
   /*
@@ -53,7 +53,7 @@ contract Swap is ERC20, Ownable {
   function getReserveBrasil() public view returns (uint256) {
     uint256 BrasilReserve = ERC20(BrasilTokenAddress).balanceOf(address(this));
     //Result in Eth
-    return (BrasilReserve / 1e18);
+    return (BrasilReserve);
   }
 
   /*
@@ -65,7 +65,7 @@ contract Swap is ERC20, Ownable {
       msg.sender
     );
     //Result in Eth
-    return (balanceFranceToken / 1e15);
+    return (balanceFranceToken);
   }
 
   function getBalanceWalletBrasil() public view returns (uint256) {
@@ -73,7 +73,7 @@ contract Swap is ERC20, Ownable {
       msg.sender
     );
     //Result in Eth
-    return (balanceBrasilToken / 1e15);
+    return (balanceBrasilToken);
   }
 
   function ownTokenContracts() public onlyOwner {
@@ -89,7 +89,6 @@ contract Swap is ERC20, Ownable {
 
   //Eth
   function addLiquidity(uint256 _amount) public onlyOwner {
-    _amount *= 1e18;
     ERC20(FranceTokenAddress).transferFrom(msg.sender, address(this), _amount);
     ERC20(BrasilTokenAddress).transferFrom(msg.sender, address(this), _amount);
   }
@@ -122,18 +121,26 @@ contract Swap is ERC20, Ownable {
    *@dev: Need to approve the Contract address from each Tokens Contract before calling the function.
    */
   //Wei
-  function sendBRAToken(uint256 _braAmount) public {
-    // _braAmount *= 1e18;
+  function sendBRAToken(uint256 _braAmount) public returns(uint){
+    
     ERC20(BrasilTokenAddress).transferFrom(
       msg.sender,
       address(this),
       _braAmount
     );
+
+    uint256 franceTokenReserve = getReserveFrance();
+    uint256 brasilTokenReserve = getReserveBrasil();
+    uint256 frReturn = (_braAmount * franceTokenReserve) /
+      (brasilTokenReserve + _braAmount);
+
+    ERC20(FranceTokenAddress).transfer(msg.sender, frReturn);
+    return frReturn;
   }
 
   //Wei
   function sendFRToken(uint256 _frAmount) public {
-    _frAmount *= 1e18;
+
     ERC20(FranceTokenAddress).transferFrom(
       msg.sender,
       address(this),
@@ -147,7 +154,6 @@ contract Swap is ERC20, Ownable {
    */
 
   function receivedFrToken(uint256 _braAmount) public {
-    // _braAmount *= 1e18;
     uint256 franceTokenReserve = getReserveFrance();
     uint256 brasilTokenReserve = getReserveBrasil();
     uint256 frReturn = (_braAmount * franceTokenReserve) /
@@ -157,23 +163,23 @@ contract Swap is ERC20, Ownable {
   }
 
   function receivedBraToken(uint256 _frAmount) public {
-    _frAmount *= 1e18;
-
+    
     uint256 franceTokenReserve = getReserveFrance();
     uint256 brasilTokenReserve = getReserveBrasil();
     uint256 braReturn = (_frAmount * brasilTokenReserve) /
       (franceTokenReserve + _frAmount);
+
 
     ERC20(BrasilTokenAddress).transfer(msg.sender, braReturn);
   }
 
 
   function balance() public view returns(uint) {
-  return ((msg.sender.balance) / 1e14) ;
+  return (msg.sender.balance) ;
   }
 
   function contractBalance() public view returns(uint) {
-    return address(this).balance / 1e14;
+    return address(this).balance;
   }
 
   //Will be 1 for France win, 2 for Draw and 3 for Brasil's win.
