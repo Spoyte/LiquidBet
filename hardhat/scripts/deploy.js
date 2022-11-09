@@ -4,8 +4,14 @@ require('dotenv').config({ path: '.env' });
 const swap = require("../artifacts/contracts/Swap.sol/Swap.json")
 const france = require("../artifacts/contracts/Tokens.sol/France.json")
 const brasil = require("../artifacts/contracts/Tokens.sol/Brasil.json")
+require("./colors")
 
-const { Contract, BigNumber } = require("ethers")
+
+
+const { Contract, BigNumber, utils } = require("ethers");
+const { color } = require('./colors');
+const { parse } = require('dotenv');
+const { parseEther } = require('ethers/lib/utils');
 
 //Deployment of the 3 Smart Contracts
 async function main() {
@@ -13,8 +19,10 @@ async function main() {
     // Wait/Sleep function
     const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
-    //Deployment of the France Token Smart Contract 
+    console.log(color.FgRed, 'DEPLOYMENT');
     console.log("");
+
+    //Deployment of the France Token Smart Contract 
     const FranceContract = await ethers.getContractFactory('France')
     const deployedFranceContract = await FranceContract.deploy()
     await deployedFranceContract.deployed()
@@ -34,6 +42,7 @@ async function main() {
     await deployedSwapContract.deployed()
     console.log('Swap Contract Address', deployedSwapContract.address)
     console.log("");
+    console.log("");
 
 
 
@@ -42,12 +51,13 @@ async function main() {
     ///////////////////////////////////////////////////////
 
     const NODE_PROVIDER_API_KEY_URL = process.env.NODE_PROVIDER_API_KEY_URL;
+    const HARDHAT_TESTNET_PRIVATE_KEY = "0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a"
     const WALLET_PRIVATE_KEY = process.env.WALLET_PRIVATE_KEY;
 
 
     // Connnecting the Wallet  
     const provider = new ethers.providers.JsonRpcProvider(NODE_PROVIDER_API_KEY_URL)
-    const wallet = new ethers.Wallet(WALLET_PRIVATE_KEY)
+    const wallet = new ethers.Wallet(HARDHAT_TESTNET_PRIVATE_KEY)
     const signer = wallet.connect(provider)
     const swapABI = swap.abi;
     const _swapContract = new ethers.Contract(
@@ -70,6 +80,16 @@ async function main() {
 
 
 
+    //////////////////////
+    // INITIALIZATION //
+    ///////////////////
+
+
+    console.log(color.FgGreen, 'INITIALIZATION');
+    console.log("");
+
+
+
     // Initialyse the Ownership of the Tokens Contracts to the Swap Contract.
     try {
         let tx = await _swapContract.ownTokenContracts({ gasLimit: 5000000 })
@@ -85,9 +105,20 @@ async function main() {
 
 
     //Amount to set in approve() function.
-    const weiApprove = "10000000000000000000000000000000000000000000000000000";
-    //Amount that the user is willing to bet in WEI .
-    const maticAmount = "10000000000000000000";
+    const weiApprove = "10000000000000000000000000000000000000000";
+    //Amount that the user is willing to bet in MATIC .
+    let maticAmount = ethers.BigNumber.from("10");
+    maticAmount = ethers.utils.parseEther(maticAmount.toString())
+    // console.log(ethers.BigNumber(maticAmount).toNumber())
+
+
+    let BigMatic = ethers.utils.formatEther(BigInt(maticAmount))
+    BigMatic = parseFloat(BigMatic).toFixed(0)
+
+
+
+    //Matic amount = 10000000000000000000
+    //BigMatic = 10
 
     // Tokens Contracts ABI
     const franceABI = france.abi;
@@ -117,8 +148,14 @@ async function main() {
     }
 
 
+    let liquidityAmount = ethers.BigNumber.from("10000")
+    liquidityAmount = utils.parseEther(liquidityAmount.toString())
+
+
+
+    //Liquidity Amont = 10000000000000000000000 = 10000*10^18
     try {
-        let tx = await _swapContract.addLiquidity(10000, { gasLimit: 5000000 })
+        let tx = await _swapContract.addLiquidity(liquidityAmount, { gasLimit: 5000000 })
         await tx.wait();
         console.log("Liquidity Added ");
         console.log("");
@@ -131,13 +168,32 @@ async function main() {
     //callStatic is used to Read data from a "view" function
     try {
         let tx = await _swapContract.callStatic.getReserveFrance()
-        console.log(`There is ${tx.toNumber()} France Tokens in the Pool`);
+        console.log(`There is ${utils.formatEther(tx)} France Tokens in the Pool`);
         tx = await _swapContract.callStatic.getReserveBrasil()
-        console.log(`There is ${tx.toNumber()} Brasil Tokens in the Pool`)
+        console.log(`There is ${utils.formatEther(tx)} Brasil Tokens in the Pool`)
         console.log("");
     } catch (error) {
         console.log(error);
     }
+
+    /////////////////////////////
+    // CONTRACT INTERACTIONS //
+    //////////////////////////
+
+    console.log(color.FgYellow, 'CONTRACT INTERACTION');
+    console.log("");
+
+
+    try {
+
+        let tx = await _swapContract.callStatic.balance()
+        tx = parseFloat(utils.formatEther(tx)).toFixed(2)
+        console.log(`You have ${tx} Matic in your Wallet`);
+
+    } catch (error) {
+        console.log(error);
+    }
+
     try {
         let _swapContract = new ethers.Contract(
             deployedSwapContract.address,
@@ -149,48 +205,58 @@ async function main() {
             value: maticAmount,
             gasLimit: 5000000
         })
-        console.log("Deposit made");
+
+        //Matic Amount here is 10 so 10x10^18 wei
+        console.log(`Deposit of ${ethers.utils.formatEther(maticAmount)} Matic successfull `);
         console.log("");
         tx = await _swapContract.callStatic.getBalanceWalletFrance()
-        tx = parseInt(ethers.utils.formatEther(BigInt(tx))).toFixed(2)
+        tx = parseFloat(ethers.utils.formatEther(BigInt(tx))).toFixed(2)
         console.log(`You have ${tx} France Tokens in your wallet`)
         tx = await _swapContract.callStatic.getBalanceWalletBrasil()
-        tx = parseInt(ethers.utils.formatEther(BigInt(tx))).toFixed(2)
+        tx = parseFloat(ethers.utils.formatEther(BigInt(tx))).toFixed(2)
         console.log(`You have ${tx} Brasil Tokens in your wallet`)
-        console.log("");
-        // ! tx = await _swapContract.sendBRAToken(maticAmount, { gasLimit: 5000000 })
-        // ! await tx.wait();
-        // ! console.log(`${ethers.utils.formatEther(maticAmount)} Bra token send to the Pool`);
+
+        tx = await _swapContract.swapBRAtoFR(maticAmount, { gasLimit: 5000000 })
+        await tx.wait();
+        console.log(`${BigMatic} Bra token send to the Pool`);
         tx = await _swapContract.callStatic.getReserveFrance()
-        console.log(`There is ${tx.toNumber()} France Tokens in the Pool`);
-        // tx = await _swapContract.receivedFrToken(maticAmount, { gasLimit: 5000000 })
-        // await tx.wait();
-        // console.log(`${ether.utils.formatEther(maticAmount)} Fr tokens received from the Pool`);
-        // console.log("");
+        tx = parseFloat(utils.formatEther(tx)).toFixed(2);
+        console.log(`There is ${tx} France Tokens in the Pool`);
+        tx = await _swapContract.callStatic.getReserveBrasil()
+        tx = parseFloat(utils.formatEther(tx)).toFixed(2);
+        console.log(`There is ${tx} Brasil Tokens in the Pool`);
+        console.log("");
+
+        tx = await _swapContract.callStatic.getBalanceWalletFrance();
+        tx = parseFloat(ethers.utils.formatEther(BigInt(tx))).toFixed(2);
+        console.log(`You have ${tx} France Tokens in your wallet`);
+        tx = await _swapContract.callStatic.getBalanceWalletBrasil();
+        tx = parseFloat(ethers.utils.formatEther(BigInt(tx))).toFixed(2);
+        console.log(`You have ${tx} Brasil Tokens in your wallet`)
 
     } catch (error) {
         console.log(error);
     }
+
 
 
 
     try {
-        let tx = await _swapContract.callStatic.getReserveFrance()
-        console.log(`There is ${tx.toNumber()} France Tokens in the Pool`);
-        tx = await _swapContract.callStatic.getReserveBrasil()
-        console.log(`There is  ${tx.toNumber()} Brasil Tokens in the Pool`)
-
-
-
+        // let tx = await _swapContract.callStatic.getReserveFrance()
+        // console.log(`There is ${tx.toNumber()} France Tokens in the Pool`);
+        let tx = await _swapContract.callStatic.getReserveBrasil()
+        tx = parseFloat(utils.formatEther(tx)).toFixed(2)
+        console.log(`There is  ${tx} Brasil Tokens in the Pool`)
 
     } catch (error) {
         console.log(error);
     }
+
+
     try {
         let tx = await _swapContract.callStatic.contractBalance()
-        tx = BigInt(tx)
-        // tx = parseInt(ethers.utils.formatEther(BigInt(tx))).toFixed(2)
-        console.log(`There is ${tx} Matic in the Contract`);
+        tx = parseFloat(utils.formatEther(tx)).toFixed(2)
+        console.log(`There is ${tx} Matics in the contract `);
 
     } catch (error) {
         console.log(error);
@@ -198,13 +264,13 @@ async function main() {
     try {
 
         let tx = await _swapContract.callStatic.balance()
-        tx = parseInt(ethers.utils.formatEther(BigInt(tx))).toFixed(2)
+        tx = parseFloat(utils.formatEther(tx)).toFixed(2)
         console.log(`You have ${tx} Matic in your Wallet`);
+        console.log("");
 
     } catch (error) {
         console.log(error);
     }
-
 
     try {
         let tx = await _swapContract.gameOver({ gasLimit: 5000000 })
@@ -212,35 +278,62 @@ async function main() {
         console.log("Game Over");
         console.log("");
 
+    } catch (error) {
+        console.log(error);
+    }
+    try {
+
+        let tx = await _swapContract.callStatic.balance()
+        tx = parseFloat(utils.formatEther(tx)).toFixed(2)
+        console.log(`You have ${tx} Matic in your Wallet`);
 
     } catch (error) {
         console.log(error);
     }
-    // ! try {
-    // !     let tx = await _swapContract.backMoney()
-    // !     await tx.wait();
-    // !     console.log("BackMoney Call");
 
-    // ! } catch (error) {
-    // !     console.log(error);
-    // ! }
+    let frTokens = ethers.BigNumber.from("9")
+    frTokens = utils.parseEther(frTokens.toString())
 
-    // ! try {
+    // try {
+    //     let tx = await _swapContract.sendMoneyBack(frTokens, { gasLimit: 5000000 })
+    //     await tx.wait();
+    //     console.log("Money Sent");
+    //     console.log("");
 
-    // !     let tx = await _swapContract.callStatic.balance()
-    // !     console.log(`You have ${tx.toNumber()} Matic in your Wallet`);
+    // } catch (error) {
+    //     console.log(error);
+    // }
 
-    // ! } catch (error) {
-    // !     console.log(error);
-    // ! }
 
-    // + try {
-    // +     let tx = await _swapContract.callStatic.contractBalance()
-    // +     console.log(`There is ${tx.toNumber()} Matic in the Contract`);
 
-    // + } catch (error) {
-    // +     console.log(error);
-    // + }
+
+    // try {
+    //     let tx = await _swapContract.backMoney()
+    //     await tx.wait();
+    //     console.log("BackMoney Call");
+
+    // } catch (error) {
+    //     console.log(error);
+    // }
+
+    // try {
+
+    //     let tx = await _swapContract.callStatic.balance()
+    //     tx = parseFloat(ethers.utils.formatEther(BigInt(tx))).toFixed(2)
+    //     console.log(`You have ${tx} Matic in your Wallet`);
+
+    // } catch (error) {
+    //     console.log(error);
+    // }
+
+    // try {
+    //     let tx = await _swapContract.callStatic.contractBalance()
+    //     tx = parseFloat(ethers.utils.formatEther(BigInt(tx))).toFixed(2)
+    //     console.log(`There is ${tx} Matic in the Contract`);
+
+    // } catch (error) {
+    //     console.log(error);
+    // }
 
 
     // //     await sleep(30000)

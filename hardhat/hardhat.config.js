@@ -17,7 +17,9 @@ module.exports = {
     // }, 
     testnet: {
       url: "http://127.0.0.1:8545/",
-      accounts: [WALLET_PRIVATE_KEY],
+      //You need to run "npx hardhat node" before launch deploy.js and don't interupt it
+      //HardHat Private Key With 10.000 TEST ETH
+      accounts: ["0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a"],
       allowUnlimitedContractSize: true,
       gas: 210000000,
       gasPrice: 800000000000
