@@ -4,12 +4,12 @@ require('dotenv').config({ path: '.env' });
 const swap = require("../artifacts/contracts/Swap.sol/Swap.json")
 const france = require("../artifacts/contracts/Tokens.sol/France.json")
 const brasil = require("../artifacts/contracts/Tokens.sol/Brasil.json")
-require("./colors")
+
 
 
 
 const { Contract, BigNumber, utils } = require("ethers");
-const { color } = require('./colors');
+
 const { parse } = require('dotenv');
 const { parseEther } = require('ethers/lib/utils');
 
@@ -19,7 +19,7 @@ async function main() {
     // Wait/Sleep function
     const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
-    console.log(color.FgRed, 'DEPLOYMENT');
+    console.log('DEPLOYMENT');
     console.log("");
 
     //Deployment of the France Token Smart Contract 
@@ -85,7 +85,7 @@ async function main() {
     ///////////////////
 
 
-    console.log(color.FgGreen, 'INITIALIZATION');
+    console.log('INITIALIZATION');
     console.log("");
 
 
@@ -180,13 +180,13 @@ async function main() {
     // CONTRACT INTERACTIONS //
     //////////////////////////
 
-    console.log(color.FgYellow, 'CONTRACT INTERACTION');
+    console.log('CONTRACT INTERACTION');
     console.log("");
 
 
     try {
 
-        let tx = await _swapContract.callStatic.balance()
+        let tx = await _swapContract.callStatic.walletBalance()
         tx = parseFloat(utils.formatEther(tx)).toFixed(2)
         console.log(`You have ${tx} Matic in your Wallet`);
 
@@ -263,7 +263,7 @@ async function main() {
     }
     try {
 
-        let tx = await _swapContract.callStatic.balance()
+        let tx = await _swapContract.callStatic.walletBalance()
         tx = parseFloat(utils.formatEther(tx)).toFixed(2)
         console.log(`You have ${tx} Matic in your Wallet`);
         console.log("");
@@ -283,7 +283,7 @@ async function main() {
     }
     try {
 
-        let tx = await _swapContract.callStatic.balance()
+        let tx = await _swapContract.callStatic.walletBalance()
         tx = parseFloat(utils.formatEther(tx)).toFixed(2)
         console.log(`You have ${tx} Matic in your Wallet`);
 
@@ -318,7 +318,7 @@ async function main() {
 
     // try {
 
-    //     let tx = await _swapContract.callStatic.balance()
+    //     let tx = await _swapContract.callStatic.walletBalance()
     //     tx = parseFloat(ethers.utils.formatEther(BigInt(tx))).toFixed(2)
     //     console.log(`You have ${tx} Matic in your Wallet`);
 
