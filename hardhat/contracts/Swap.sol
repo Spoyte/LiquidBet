@@ -152,8 +152,8 @@ contract Swap is ERC20, Ownable {
   }
 
   /*
-   *@notice: Send back the Token and Swap it for some ETH/MATIC If the User wins his bet.
-   *@notice: Send back the token but don't swap it If he losses.
+   *@notice: User send back the Token and Swap it for some ETH/MATIC If the User wins his bet.
+   *@notice: User send back the token but don't swap it If he losses.
    *@dev: Function to be call when the game is over.
    */
 
@@ -162,8 +162,6 @@ contract Swap is ERC20, Ownable {
 
     uint256 balanceFranceToken = getBalanceWalletFrance();
     uint256 balanceBrasilToken = getBalanceWalletBrasil();
-
-    // uint256 balanceBrasilToken = getBalanceWalletBrasil();
 
     if (FinalResult == 1) {
       require(
@@ -207,7 +205,3 @@ contract Swap is ERC20, Ownable {
     // }
   }
 }
-
-// return (balanceFranceToken, balanceBrasilToken);
-
-// 0xde12A52cd5AB09b995404f7145A77b621eB5946cd8et
