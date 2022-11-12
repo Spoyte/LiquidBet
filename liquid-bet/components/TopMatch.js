@@ -1,14 +1,13 @@
 import styles from '../styles/Home.module.css'
 import  brazil from '../assets/brazil.svg'
 import  france from '../assets/france.svg'
-import { BRAZIL_TOKEN_ABI, 
-    BRAZIL_TOKEN_ADDRESS, 
-    FRANCE_TOKEN_ADDRESS, 
-    FRANCE_TOKEN_ABI, 
+import { 
     SWAP_CONTRACT_ADDRESS, 
-    SWAP_CONTRACT_ABI
+    SWAP_CONTRACT_ABI,
+    SWAP_CONTRACT_ABI2,
+    SWAP_CONTRACT_ADDRESS2,
   } from "../constants"
-  import { useAccount, useContract, useContractRead, useContractWrite, usePrepareContractWrite } from 'wagmi';
+  import { useContractWrite, usePrepareContractWrite } from 'wagmi';
 
 
 const TopMatch = () => {
@@ -16,9 +15,9 @@ const TopMatch = () => {
      * Send BRA Token to pool for user who bets on France
      */
     const { config: sendBRATokenConfig } = usePrepareContractWrite({
-        address: SWAP_CONTRACT_ADDRESS,
-        abi: SWAP_CONTRACT_ABI,
-        functionName: "sendBRAToken",
+        address: SWAP_CONTRACT_ADDRESS2,
+        abi: SWAP_CONTRACT_ABI2,
+        functionName: "swapBRAtoFR",
         args: [1],
       })
        const { write: sendBRATokenWrite } = useContractWrite({
@@ -35,9 +34,9 @@ const TopMatch = () => {
      * Send FRA Token to pool for user who bets on Brazil
      */
     const { config: sendFRATokenConfig } = usePrepareContractWrite({
-        address: SWAP_CONTRACT_ADDRESS,
-        abi: SWAP_CONTRACT_ABI,
-        functionName: "sendFRToken",
+        address: SWAP_CONTRACT_ADDRESS2,
+        abi: SWAP_CONTRACT_ABI2,
+        functionName: "swapFRtoBRA",
         args: [1],
       })
        const { write: sendFRATokenWrite } = useContractWrite({
@@ -50,44 +49,44 @@ const TopMatch = () => {
         }
     })
 
-    /**
-     * Receive BRA Tokens for user who bets on Brazil
-     */
-    const { config: receivedBraTokenConfig } = usePrepareContractWrite({
-        address: SWAP_CONTRACT_ADDRESS,
-        abi: SWAP_CONTRACT_ABI,
-        functionName: "receivedBraToken",
-        args: [1],
-      })
-       const { write: receivedBraTokenWrite } = useContractWrite({
-       ...receivedBraTokenConfig,
-        onSuccess() {
-            alert('Transaction Successful')
-        },
-        onError(error) {
-            alert(error.message.slice(0, 25))
-        }
-    })
+    // /**
+    //  * Receive BRA Tokens for user who bets on Brazil
+    //  */
+    // const { config: receivedBraTokenConfig } = usePrepareContractWrite({
+    //     address: SWAP_CONTRACT_ADDRESS,
+    //     abi: SWAP_CONTRACT_ABI,
+    //     functionName: "receivedBraToken",
+    //     args: [1],
+    //   })
+    //    const { write: receivedBraTokenWrite } = useContractWrite({
+    //    ...receivedBraTokenConfig,
+    //     onSuccess() {
+    //         alert('Transaction Successful')
+    //     },
+    //     onError(error) {
+    //         alert(error.message.slice(0, 25))
+    //     }
+    // })
 
 
-    /**
-     * Receive FRA Tokens for user who bets on France
-     */
-    const { config: receivedFrTokenConfig } = usePrepareContractWrite({
-        address: SWAP_CONTRACT_ADDRESS,
-        abi: SWAP_CONTRACT_ABI,
-        functionName: "receivedFrToken",
-        args: [1],
-      })
-       const { write: receivedFrTokenWrite } = useContractWrite({
-       ...receivedFrTokenConfig,
-        onSuccess() {
-            alert('Transaction Successful')
-        },
-        onError(error) {
-            alert(error.message.slice(0, 25))
-        }
-    })
+    // /**
+    //  * Receive FRA Tokens for user who bets on France
+    //  */
+    // const { config: receivedFrTokenConfig } = usePrepareContractWrite({
+    //     address: SWAP_CONTRACT_ADDRESS,
+    //     abi: SWAP_CONTRACT_ABI,
+    //     functionName: "receivedFrToken",
+    //     args: [1],
+    //   })
+    //    const { write: receivedFrTokenWrite } = useContractWrite({
+    //    ...receivedFrTokenConfig,
+    //     onSuccess() {
+    //         alert('Transaction Successful')
+    //     },
+    //     onError(error) {
+    //         alert(error.message.slice(0, 25))
+    //     }
+    // })
        
     return ( 
         <div className={styles.topmatch}>
@@ -100,8 +99,8 @@ const TopMatch = () => {
                         <span>France</span>
                         <span className={styles.odds}  onClick={()=>{
                             sendBRATokenWrite() 
-                            receivedFrTokenWrite()
-                            receivedBraTokenWrite()
+                            // receivedFrTokenWrite()
+                            // receivedBraTokenWrite()
                         }
                         }>1 <span>3.20</span></span>
                     </div>

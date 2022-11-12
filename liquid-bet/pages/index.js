@@ -7,24 +7,27 @@ import { BRAZIL_TOKEN_ABI,
   FRANCE_TOKEN_ADDRESS, 
   FRANCE_TOKEN_ABI, 
   SWAP_CONTRACT_ADDRESS, 
-  SWAP_CONTRACT_ABI
+  SWAP_CONTRACT_ABI,
+  SWAP_CONTRACT_ABI2,
+  SWAP_CONTRACT_ADDRESS2,
+  BRAZIL_TOKEN_ABI2,
+  BRAZIL_TOKEN_ADDRESS2,
+  FRANCE_TOKEN_ABI2,
+  FRANCE_TOKEN_ADDRESS2
 } from "../constants"
-import { useAccount, useContract, useContractRead, useContractWrite, usePrepareContractWrite } from 'wagmi';
+
+
+import { useAccount, useContractWrite, usePrepareContractWrite } from 'wagmi';
 import { useState, useEffect, useRef } from 'react'
 import { useIsMounted } from '../hooks/useIsMounted'
 import { useSigner } from 'wagmi'
-import { Writer } from '@ethersproject/abi/lib/coders/abstract-coder'
-import { parseEther } from 'ethers/lib/utils'
 import { BigNumber, ethers, utils } from 'ethers'
 
 
 
 export default function Home() {
   const { data: signer, isError, isLoading }= useSigner();
-  const mounted = useIsMounted()
   const { address } = useAccount();
-  const [lptokens, setLpTokens] = useState('');
-  const [balanceWallet, setBalanceWallet] = useState();
   const [title, setTitle] = useState('')
   
  
@@ -33,10 +36,10 @@ export default function Home() {
    * Approve Function on BRA Tokens
    */
   const { config: brazilConfig }  = usePrepareContractWrite({
-      address: BRAZIL_TOKEN_ADDRESS,
-      abi: BRAZIL_TOKEN_ABI,
+      address: BRAZIL_TOKEN_ADDRESS2,
+      abi: BRAZIL_TOKEN_ABI2,
       functionName: "approve",
-      args: [SWAP_CONTRACT_ADDRESS, 10000000]
+      args: [SWAP_CONTRACT_ADDRESS2, 10000000]
     })
     const { write: brazilWrite } = useContractWrite(brazilConfig);
     
@@ -45,10 +48,10 @@ export default function Home() {
    * Approve Function on FRA Tokens
    */
     const { config: franceConfig }  = usePrepareContractWrite({
-      address: BRAZIL_TOKEN_ADDRESS,
-      abi: BRAZIL_TOKEN_ABI,
+      address: FRANCE_TOKEN_ADDRESS2,
+      abi: FRANCE_TOKEN_ABI2,
       functionName: "approve",
-      args: [SWAP_CONTRACT_ADDRESS, 10000000],
+      args: [SWAP_CONTRACT_ADDRESS2, 10000000],
       
     })
     const { write: franceWrite  } = useContractWrite({
@@ -65,8 +68,8 @@ export default function Home() {
    * default value is 0.002 Matic
    */
     const { config: depositConfig }  = usePrepareContractWrite({
-      address: SWAP_CONTRACT_ADDRESS,
-      abi: SWAP_CONTRACT_ABI,
+      address: SWAP_CONTRACT_ADDRESS2,
+      abi: SWAP_CONTRACT_ABI2,
       functionName: "deposit",
       overrides: {
         from: address,
@@ -74,7 +77,6 @@ export default function Home() {
       },
       
     })
-   
   const { write: depositWrite } = useContractWrite({
     ...depositConfig,
     onSuccess() {
