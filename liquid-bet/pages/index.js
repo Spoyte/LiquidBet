@@ -24,7 +24,14 @@ import { useSigner } from 'wagmi'
 import { BigNumber, ethers, utils } from 'ethers'
 
 
-
+/**!!!!  IMPORANT  !!!
+ * To Run successfully:
+ * CREATE A FILE .env.local IN THE PROJECT FOLDER
+ * ADD THIS TEXT ---> NEXT_PUBLIC_ALCHEMY_KEY=""
+ * THE KEY FROM ALCHEMY IS THE ONE WITHOUT HTTPS JUST THE KEY e.g"YFAVCbnfgs"
+ * NOT https://alchemy.......
+ *  
+ */
 export default function Home() {
   const { data: signer, isError, isLoading }= useSigner();
   const { address } = useAccount();
