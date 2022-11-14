@@ -57,7 +57,7 @@ async function main() {
 
     // Connnecting the Wallet  
     const provider = new ethers.providers.JsonRpcProvider(NODE_PROVIDER_API_KEY_URL)
-    const wallet = new ethers.Wallet(HARDHAT_TESTNET_PRIVATE_KEY)
+    const wallet = new ethers.Wallet(WALLET_PRIVATE_KEY)
     const signer = wallet.connect(provider)
     const swapABI = swap.abi;
     const _swapContract = new ethers.Contract(
