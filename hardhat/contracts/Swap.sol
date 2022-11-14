@@ -35,7 +35,7 @@ contract Swap is ERC20, Ownable {
   function getReserveFrance() public view returns (uint256) {
     uint256 FranceReserve = ERC20(FranceTokenAddress).balanceOf(address(this));
     return (FranceReserve);
-  }  
+  }
 
   /*
    *@notice: Public function that shows the balance of Brasil Tokens in the contract
@@ -202,7 +202,7 @@ contract Swap is ERC20, Ownable {
     //     balanceBrasilToken
     //   );
     //   (bool sent, ) = payable(msg.sender).call{ value: contractBalance() }("");
-    //   require(sent, "Failed to send Ether");
+    //   require(sent,"Failed to send Ether");
     // }
   }
 }

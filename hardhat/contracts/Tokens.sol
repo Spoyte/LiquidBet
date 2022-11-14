@@ -45,7 +45,7 @@ contract France is ERC20 {
     _mint(_address, _amount);
   }
 
-  // 0xde12A52cd5AB09b995404f7145A77b621eB5946cd8
+  // 0xde12A52cd5AB09b995404f7145A77b621eB5946cd
 }
 
 /*
@@ -86,5 +86,5 @@ contract Brasil is ERC20 {
     _mint(_address, _amount);
   }
 
-  // 0xde12A52cd5AB09b995404f7145A77b621eB5946cd8
+  // 0xde12A52cd5AB09b995404f7145A77b621eB5946cd
 }

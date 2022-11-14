@@ -51,13 +51,14 @@ async function main() {
     ///////////////////////////////////////////////////////
 
     const NODE_PROVIDER_API_KEY_URL = process.env.NODE_PROVIDER_API_KEY_URL;
+    const NODE_PROVIDER_TESTNET_URL = "http://127.0.0.1:8545/"
     const HARDHAT_TESTNET_PRIVATE_KEY = "0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a"
     const WALLET_PRIVATE_KEY = process.env.WALLET_PRIVATE_KEY;
 
 
     // Connnecting the Wallet  
-    const provider = new ethers.providers.JsonRpcProvider(NODE_PROVIDER_API_KEY_URL)
-    const wallet = new ethers.Wallet(WALLET_PRIVATE_KEY)
+    const provider = new ethers.providers.JsonRpcProvider(NODE_PROVIDER_TESTNET_URL)
+    const wallet = new ethers.Wallet(HARDHAT_TESTNET_PRIVATE_KEY)
     const signer = wallet.connect(provider)
     const swapABI = swap.abi;
     const _swapContract = new ethers.Contract(
@@ -107,7 +108,8 @@ async function main() {
     //Amount to set in approve() function.
     const weiApprove = "10000000000000000000000000000000000000000";
     //Amount that the user is willing to bet in MATIC .
-    let maticAmount = ethers.BigNumber.from("10");
+    let maticAmount = "0.1"
+    // ethers.BigNumber.from("1");
     maticAmount = ethers.utils.parseEther(maticAmount.toString())
     // console.log(ethers.BigNumber(maticAmount).toNumber())
 
@@ -188,7 +190,7 @@ async function main() {
 
         let tx = await _swapContract.callStatic.walletBalance()
         tx = parseFloat(utils.formatEther(tx)).toFixed(2)
-        console.log(`You have ${tx} Matic in your Wallet`);
+        console.log(`You have ${tx} Matic in your Wall et`);
 
     } catch (error) {
         console.log(error);
