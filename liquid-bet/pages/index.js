@@ -2,9 +2,106 @@ import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import TopMatch from '../components/TopMatch'
 import Bets from '../components/Bets'
+import { BRAZIL_TOKEN_ABI, 
+  BRAZIL_TOKEN_ADDRESS, 
+  FRANCE_TOKEN_ADDRESS, 
+  FRANCE_TOKEN_ABI, 
+  SWAP_CONTRACT_ADDRESS, 
+  SWAP_CONTRACT_ABI,
+  SWAP_CONTRACT_ABI2,
+  SWAP_CONTRACT_ADDRESS2,
+  BRAZIL_TOKEN_ABI2,
+  BRAZIL_TOKEN_ADDRESS2,
+  FRANCE_TOKEN_ABI2,
+  FRANCE_TOKEN_ADDRESS2
+} from "../constants"
 
 
+import { useAccount, useContractWrite, usePrepareContractWrite } from 'wagmi';
+import { useState, useEffect, useRef } from 'react'
+import { useIsMounted } from '../hooks/useIsMounted'
+import { useSigner } from 'wagmi'
+import { BigNumber, ethers, utils } from 'ethers'
+
+
+/**!!!!  IMPORANT  !!!
+ * To Run successfully:
+ * CREATE A FILE .env.local IN THE PROJECT FOLDER
+ * ADD THIS TEXT ---> NEXT_PUBLIC_ALCHEMY_KEY=""
+ * THE KEY FROM ALCHEMY IS THE ONE WITHOUT HTTPS JUST THE KEY e.g"YFAVCbnfgs"
+ * NOT https://alchemy.......
+ *  
+ */
 export default function Home() {
+  const { data: signer, isError, isLoading }= useSigner();
+  const { address } = useAccount();
+  const [title, setTitle] = useState('')
+  
+ 
+
+  /***
+   * Approve Function on BRA Tokens
+   */
+  const { config: brazilConfig }  = usePrepareContractWrite({
+      address: BRAZIL_TOKEN_ADDRESS2,
+      abi: BRAZIL_TOKEN_ABI2,
+      functionName: "approve",
+      args: [SWAP_CONTRACT_ADDRESS2, 10000000]
+    })
+    const { write: brazilWrite } = useContractWrite(brazilConfig);
+    
+
+    /***
+   * Approve Function on FRA Tokens
+   */
+    const { config: franceConfig }  = usePrepareContractWrite({
+      address: FRANCE_TOKEN_ADDRESS2,
+      abi: FRANCE_TOKEN_ABI2,
+      functionName: "approve",
+      args: [SWAP_CONTRACT_ADDRESS2, 10000000],
+      
+    })
+    const { write: franceWrite  } = useContractWrite({
+      ...franceConfig,
+      onSuccess() {
+        disableApproveBtn()
+      }
+    })
+   
+
+    /***
+   * Call Deposit Function on BRA Tokens
+   * 
+   * default value is 0.002 Matic
+   */
+    const { config: depositConfig }  = usePrepareContractWrite({
+      address: SWAP_CONTRACT_ADDRESS2,
+      abi: SWAP_CONTRACT_ABI2,
+      functionName: "deposit",
+      overrides: {
+        from: address,
+        value: ethers.utils.parseEther(title ? title : '0.002')
+      },
+      
+    })
+  const { write: depositWrite } = useContractWrite({
+    ...depositConfig,
+    onSuccess() {
+      alert('Transaction Successful')
+    },
+    onError(error) {
+      alert(error.message.slice(0, 25))
+    }
+  })
+
+  /**
+   * Disable Approve button when transaction is succesful
+   */
+  const ref = useRef(null);
+  const disableApproveBtn = () => {
+    ref.current.hidden = true;
+  }
+  
   return (
     <div className={styles.container}>
       <Head>
@@ -13,6 +110,27 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div>
+        <button className={styles.approve} ref={ref} onClick={() => {
+          brazilWrite()
+          franceWrite()}}>
+          Approve
+        </button>
+        <div className={styles.depositContainer}>
+          <p>Deposit Matic to place Bets <br/>(default 0.002MATIC)</p>
+          <form>
+            <input
+              type='number'
+              title="Amount of MATIC to deposit"
+              placeholder='Enter MATIC amount to Deposit'
+              onChange={e => setTitle(e.target.value)}
+              value={title}
+            />
+            <button onClick={(e) => {
+                e.preventDefault()
+                depositWrite()
+               }}>Deposit</button>
+          </form>
+        </div>
         
         <TopMatch/>
         <Bets/>

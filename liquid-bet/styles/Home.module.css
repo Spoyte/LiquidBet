@@ -1,11 +1,18 @@
 .navbar {
   display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   background-color: #FD841F;
   justify-content: space-between;
   padding: 10px;
   align-items: center;
   font-family: 'Kodchasan', sans-serif;
   border-bottom: 1px solid black;
+}
+.container{
+  margin-top: 14%;
 }
 .footer {
   display: flex;
@@ -29,14 +36,34 @@
 }
 .topmatch {
   border: 1px solid black;
-  background-color: #FFA3A3;
+  background-image: linear-gradient(to bottom right, white, rgba(54, 132, 163, 0.382));
   padding: 5px;
   margin: 15px;
   border-radius: 5px;
 }
+.topmatch > p{
+  text-align: center;
+  font-weight: bolder;
+  font-size: 20px;
+}
+.approve{
+  padding: 5px 15px;
+  background-color: rgb(97, 174, 97);
+  border: 1px solid black;
+  outline: none;
+  margin-top: 1px;
+  margin-right: 5%;
+  float: right;
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 7px;
+}
+.approve:hover{
+  background-color: gray;
+}
 .bets {
   border: 1px solid black;
-  background-color: #FFA3A3;
+  background-color: #a3cfff;
   padding: 10px;
   margin: 15px;
   border-radius: 5px;
@@ -48,20 +75,25 @@
   align-self: center;
 }
 .slipdetails{
-  background-color: rgb(177, 177, 177);
+  background-color: #719bfd;
   padding: 7px;
-  border: 2px solid rgb(54, 54, 54);
+  border: 1px solid rgb(54, 54, 54);
   border-radius: 7px;
 }
 .slipOdds {
   float: right;
   margin-right: 20px;
+  font-weight: bolder;
 }
 .betAmount{
   background-color: rgb(174, 174, 174);
   padding:10px;
   border: 1px solid black;
   border-radius: 7px;
+}
+.betAmount> span {
+  float: right;
+  font-weight: bold;
 }
 .betBTN{
   width: 30%;
@@ -71,17 +103,80 @@
   font-weight: bold;
   border-radius: 7px;
   border: 1px solid black;
-  
-}.betBTN:hover{
-  background-color: rgb(90, 90, 90);
+}
+.betBTN:hover {
+  background-color: rgb(68, 153, 91);
 }
 
-@media (max-width: 600px) {
-  .grid {
-    width: 100%;
-    flex-direction: column;
-  }
+.matches {
+  background-color: #719bfd;
+  color: white;
+  margin: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid black;
+  border-radius: 7px;
 }
+.flags{
+  display: flex;
+
+}
+.flags>div{
+  margin: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin:  20px;
+}
+.odds{
+  cursor: pointer;
+  background-color: rgb(187, 187, 187);
+  padding:  5px 15px;
+  border-radius: 7px;
+  border:1px solid black;
+  color: black;
+  margin-top: 5px;
+}
+.odds:hover{
+  background-color: rgb(67, 180, 67);
+}
+.odds>span {
+  margin-left: 9px;
+  font-weight: bold;
+}
+.teamname {
+  font-weight: bolder;
+}
+.depositContainer {
+  padding: 10px;
+  font-weight: 100;
+  font-size: medium;
+}
+.depositContainer > form > input{
+  padding: 7px;
+  border-radius: 5px 0 0 5px;
+  text-decoration: none;
+  outline: none;
+  border: 1px solid black;
+  font-size: small;
+  font-weight: bold;
+}
+.depositContainer > form > button{
+  padding: 7px;
+  border: 1px solid black;
+  cursor: pointer;
+}
+.depositContainer > form > button:hover{
+  background-color: rgb(34, 153, 34);
+  color: white
+}
+/* @media (max-width: 1000px) {
+  body {
+    background-color: green;
+  }
+} */
 
 @media (prefers-color-scheme: dark) {
   .card,

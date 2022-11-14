@@ -11,6 +11,7 @@ import "./Tokens.sol";
 *@title: Swap Contract. 
 *@notice: Creation of the Swap Smart Contract.
 *@dev: Allow the user to Bet on a specific Soccer team.
+ extra comment
 */
 contract Swap is ERC20, Ownable {
   address public FranceTokenAddress;
@@ -34,7 +35,7 @@ contract Swap is ERC20, Ownable {
   function getReserveFrance() public view returns (uint256) {
     uint256 FranceReserve = ERC20(FranceTokenAddress).balanceOf(address(this));
     return (FranceReserve);
-  }
+  }  
 
   /*
    *@notice: Public function that shows the balance of Brasil Tokens in the contract
