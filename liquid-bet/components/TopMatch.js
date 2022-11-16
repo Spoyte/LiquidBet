@@ -3,12 +3,19 @@ import brazil from '../assets/brazil.svg'
 import france from '../assets/france.svg'
 import { useAccount } from 'wagmi';
 import {
-    SWAP_CONTRACT_ABI,
+    BRAZIL_TOKEN_ABI,
+    BRAZIL_TOKEN_ADDRESS,
+    FRANCE_TOKEN_ADDRESS,
+    FRANCE_TOKEN_ABI,
     SWAP_CONTRACT_ADDRESS,
+    SWAP_CONTRACT_ABI,
+
 } from "../constants"
 import { useContractWrite, usePrepareContractWrite } from 'wagmi';
 import { ethers } from 'ethers'
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+
+
 
 
 
@@ -16,10 +23,54 @@ const TopMatch = () => {
 
     const [titleFR, settitleFR] = useState("")
     const [titleBRA, settitleBRA] = useState("")
+    const ref = useRef(null);
+    const disableApproveBtn = () => {
+        ref.current.hidden = true;
+    }
     /**
      * Send BRA Token to pool for user who bets on France
      */
     const { address } = useAccount();
+
+
+    const { config: brazilApproveConfig } = usePrepareContractWrite({
+        address: BRAZIL_TOKEN_ADDRESS,
+        abi: BRAZIL_TOKEN_ABI,
+        functionName: "approve",
+        args: [SWAP_CONTRACT_ADDRESS, 10000000]
+    })
+    const { write: brazilWrite } = useContractWrite(brazilApproveConfig);
+
+
+    /***
+   * Approve Function on FRA Tokens
+   */
+    const { config: franceApproveConfig } = usePrepareContractWrite({
+        address: FRANCE_TOKEN_ADDRESS,
+        abi: FRANCE_TOKEN_ABI,
+        functionName: "approve",
+        args: [SWAP_CONTRACT_ADDRESS, 10000000],
+
+    })
+    const { write: franceWrite } = useContractWrite({
+        ...franceApproveConfig,
+        onSuccess() {
+            disableApproveBtn()
+        }
+    })
+
+    const { config: gameOverConfig } = usePrepareContractWrite({
+        address: SWAP_CONTRACT_ADDRESS,
+        abi: SWAP_CONTRACT_ABI,
+        functionName: "gameOver",
+
+    })
+    const { write: gameOverWrite } = useContractWrite({
+        ...gameOverConfig,
+        onError(error) {
+            alert(error.message.slice(0, 25))
+        }
+    })
 
     const { config: deposit_swapBRAtoFRConfig } = usePrepareContractWrite({
         address: SWAP_CONTRACT_ADDRESS,
@@ -54,41 +105,21 @@ const TopMatch = () => {
         }
     })
 
-    // const { config: swapBraToFrConfig } = usePrepareContractWrite({
-    //     address: SWAP_CONTRACT_ADDRESS,
-    //     abi: SWAP_CONTRACT_ABI,
-    //     functionName: "swapBRAtoFR",
-    //     args: [100],
-    // })
-    // const { write: swapBraToFrWrite } = useContractWrite({
-    //     ...swapBraToFrConfig,
-    //     onError(error) {
-    //         console.error(error)
-    //     }
-
-    // })
-
-    // /**
-    //  * Send FRA Token to pool for user who bets on Brazil
-    //  */
-    // const { config: swapFrToBraConfig } = usePrepareContractWrite({
-    //     address: SWAP_CONTRACT_ADDRESS,
-    //     abi: SWAP_CONTRACT_ABI,
-    //     functionName: "swapFRtoBRA",
-    //     args: [1],
-    // })
-    // const { write: swapFrToBraWrite } = useContractWrite({
-    //     ...swapFrToBraConfig,
-    //     onError(error) {
-    //         alert(error.message.slice(0, 25))
-    //     }
-    // })
 
     return (
         <div className={styles.topmatch}>
             <p>⚽ Top Football Matches!</p>
+
             <div className={styles.matches}>
                 <p>World cup - FIFA</p>
+                <div>
+                    <button className={styles.approve} ref={ref} onClick={() => {
+                        brazilWrite()
+                        franceWrite()
+                    }}>
+                        Approve before deposit
+                    </button>
+                </div>
                 <div className={styles.flags}>
 
 
@@ -111,7 +142,6 @@ const TopMatch = () => {
                                 }}>Deposit</button>
                             </form>
                         </div>
-                        {/* <span className={styles.odds} onClick={() => deposit_swapBRAtoFRWrite()}>1 <span>3.20</span></span> */}
                     </div>
 
 
@@ -122,7 +152,7 @@ const TopMatch = () => {
                         <span><img src={brazil.src} width='50px' alt="brazil flag" /></span>
                         <span>Brazil</span>
                         <div className={styles.depositContainer}>
-                            <p>Deposit Matic to place Bets <br /></p>
+                            <p>Deposit Matic to place Bets</p>
                             <form>
                                 <input
                                     type='number'
@@ -137,12 +167,14 @@ const TopMatch = () => {
                                 }}>Deposit</button>
                             </form>
                         </div>
-
                     </div>
 
+
+                    <button onClick={() => gameOverWrite()} >
+
+                        I'm the Game Over Function() </button>
                 </div>
             </div>
-
         </div>
     );
 }
