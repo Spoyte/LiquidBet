@@ -13,16 +13,15 @@ import {
 } from "../constants"
 
 
-import { useAccount, useContractWrite, usePrepareContractWrite } from 'wagmi';
+import { useContractWrite, usePrepareContractWrite } from 'wagmi';
 import { useState, useRef } from 'react'
 
-// import { useSigner } from 'wagmi'
-import { ethers } from 'ethers'
+
 
 export default function Home() {
-  // const { data: signer, isError, isLoading } = useSigner();
-  const { address } = useAccount();
-  const [title, setTitle] = useState('')
+
+
+
 
 
 
@@ -86,22 +85,6 @@ export default function Home() {
         }}>
           Approve
         </button>
-        <div className={styles.depositContainer}>
-          <p>Deposit Matic to place Bets <br />(default 0.002MATIC)</p>
-          <form>
-            <input
-              type='number'
-              title="Amount of MATIC to deposit"
-              placeholder='Enter MATIC amount to Deposit'
-              onChange={e => setTitle(e.target.value)}
-              value={title}
-            />
-            <button onClick={(e) => {
-              e.preventDefault()
-              depositWrite()
-            }}>Deposit</button>
-          </form>
-        </div>
 
         <TopMatch />
         <Bets />

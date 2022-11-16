@@ -14,7 +14,8 @@ import { useState } from 'react';
 
 const TopMatch = () => {
 
-    const [title, setTitle] = useState("")
+    const [titleFR, settitleFR] = useState("")
+    const [titleBRA, settitleBRA] = useState("")
     /**
      * Send BRA Token to pool for user who bets on France
      */
@@ -26,7 +27,7 @@ const TopMatch = () => {
         functionName: "deposit_swapBRAtoFR",
         overrides: {
             from: address,
-            value: ethers.utils.parseEther(title ? title : "0.001")
+            value: ethers.utils.parseEther(titleFR ? titleFR : "0.001")
         },
 
     })
@@ -42,7 +43,7 @@ const TopMatch = () => {
         functionName: "deposit_swapFRtoBRA",
         overrides: {
             from: address,
-            value: ethers.utils.parseEther(title ? title : "0.001")
+            value: ethers.utils.parseEther(titleBRA ? titleBRA : "0.001")
         },
 
     })
@@ -89,17 +90,20 @@ const TopMatch = () => {
             <div className={styles.matches}>
                 <p>World cup - FIFA</p>
                 <div className={styles.flags}>
+
+
                     <div>
                         <span><img src={france.src} width='50px' alt="france flag" /></span>
+                        <span>France</span>
                         <div className={styles.depositContainer}>
-                            <p>Deposit Matic to place Bets <br />(default 0.002MATIC)</p>
+                            <p>Deposit Matic to place Bets</p>
                             <form>
                                 <input
                                     type='number'
-                                    title="Amount of MATIC to deposit"
-                                    placeholder='Enter MATIC amount to Deposit'
-                                    onChange={e => setTitle(e.target.value)}
-                                    value={title}
+                                    titleFR="Amount of MATIC to deposit"
+                                    placeholder='MATIC Amount'
+                                    onChange={e => settitleFR(e.target.value)}
+                                    value={titleFR}
                                 />
                                 <button onClick={(e) => {
                                     e.preventDefault()
@@ -107,14 +111,33 @@ const TopMatch = () => {
                                 }}>Deposit</button>
                             </form>
                         </div>
-                        <span>France</span>
                         {/* <span className={styles.odds} onClick={() => deposit_swapBRAtoFRWrite()}>1 <span>3.20</span></span> */}
                     </div>
+
+
                     <div>Today <br />20:45</div>
+
+
                     <div>
                         <span><img src={brazil.src} width='50px' alt="brazil flag" /></span>
                         <span>Brazil</span>
-                        {/* <span className={styles.odds} onClick={() => deposit_swapFRtoBRAWrite()}>2 <span>2.20</span></span> */}
+                        <div className={styles.depositContainer}>
+                            <p>Deposit Matic to place Bets <br /></p>
+                            <form>
+                                <input
+                                    type='number'
+                                    titleFR="Amount of MATIC to deposit"
+                                    placeholder='MATIC Amount'
+                                    onChange={e => settitleFR(e.target.value)}
+                                    value={titleBRA}
+                                />
+                                <button onClick={(e) => {
+                                    e.preventDefault()
+                                    deposit_swapFRtoBRAWrite()
+                                }}>Deposit</button>
+                            </form>
+                        </div>
+
                     </div>
 
                 </div>
