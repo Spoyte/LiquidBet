@@ -106,33 +106,71 @@ contract Swap is ERC20, Ownable {
    *@dev: Need to approve the Contract address from each Tokens Contract before calling the function.
    */
   //Wei
-  function swapBRAtoFR(uint256 _braAmount) public {
+  // function swapBRAtoFR(uint256 _braAmount) public {
+  //   ERC20(BrasilTokenAddress).transferFrom(
+  //     msg.sender,
+  //     address(this),
+  //     _braAmount
+  //   );
+
+  //   uint256 franceTokenReserve = getReserveFrance();
+  //   uint256 brasilTokenReserve = getReserveBrasil() - _braAmount;
+  //   uint256 frReturn = (_braAmount * franceTokenReserve) /
+  //     (brasilTokenReserve + _braAmount);
+
+  //   ERC20(FranceTokenAddress).transfer(msg.sender, frReturn);
+  // }
+  // function swapFRtoBRA(uint256 _frAmount) public {
+  //   _frAmount *= 1e15;
+  //   ERC20(FranceTokenAddress).transferFrom(
+  //     msg.sender,
+  //     address(this),
+  //     _frAmount
+  //   );
+  //   uint256 brasilTokenReserve = getReserveBrasil();
+  //   uint256 franceTokenReserve = getReserveFrance() - _frAmount;
+  //   uint256 braReturn = (_frAmount * brasilTokenReserve) /
+  //     (franceTokenReserve + _frAmount);
+
+  //   ERC20(BrasilTokenAddress).transfer(msg.sender, braReturn);
+  // }
+
+  function deposit_swapBRAtoFR() public payable {
+    require(msg.value > 0, "You didn't provide any funds");
+    France(FranceTokenAddress).mint(msg.sender, msg.value);
+    Brasil(BrasilTokenAddress).mint(msg.sender, msg.value);
+
     ERC20(BrasilTokenAddress).transferFrom(
       msg.sender,
       address(this),
-      _braAmount
+      msg.value
     );
 
     uint256 franceTokenReserve = getReserveFrance();
-    uint256 brasilTokenReserve = getReserveBrasil() - _braAmount;
-    uint256 frReturn = (_braAmount * franceTokenReserve) /
-      (brasilTokenReserve + _braAmount);
+    uint256 brasilTokenReserve = getReserveBrasil() - msg.value;
+    uint256 frReturn = (msg.value * franceTokenReserve) /
+      (brasilTokenReserve + msg.value);
 
     ERC20(FranceTokenAddress).transfer(msg.sender, frReturn);
   }
 
-  function swapFRtoBRA(uint256 _frAmount) public {
-    ERC20(FranceTokenAddress).transferFrom(
+  function deposit_swapFRtoBRA() public payable {
+    require(msg.value > 0, "You didn't provide any funds");
+    France(FranceTokenAddress).mint(msg.sender, msg.value);
+    Brasil(BrasilTokenAddress).mint(msg.sender, msg.value);
+
+    ERC20(BrasilTokenAddress).transferFrom(
       msg.sender,
       address(this),
-      _frAmount
+      msg.value
     );
-    uint256 brasilTokenReserve = getReserveBrasil();
-    uint256 franceTokenReserve = getReserveFrance() - _frAmount;
-    uint256 braReturn = (_frAmount * brasilTokenReserve) /
-      (franceTokenReserve + _frAmount);
 
-    ERC20(BrasilTokenAddress).transfer(msg.sender, braReturn);
+    uint256 franceTokenReserve = getReserveFrance();
+    uint256 brasilTokenReserve = getReserveBrasil() - msg.value;
+    uint256 frReturn = (msg.value * franceTokenReserve) /
+      (brasilTokenReserve + msg.value);
+
+    ERC20(FranceTokenAddress).transfer(msg.sender, frReturn);
   }
 
   function walletBalance() public view returns (uint256) {

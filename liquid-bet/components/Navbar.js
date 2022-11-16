@@ -9,15 +9,15 @@ const Navbar = () => {
                 <img src={logo.src} alt="df" width='30px' />
                 <span>Liquid Bet</span>
             </div>
-            
 
-            <span className={styles.connect}><ConnectButton 
+
+            <span className={styles.connect}><ConnectButton
                 label='Connect Wallet'
                 accountStatus="address"
                 borderRadius="none"
             /></span>
         </nav>
-      );
+    );
 }
- 
+
 export default Navbar;
