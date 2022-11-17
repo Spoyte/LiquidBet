@@ -354,28 +354,33 @@ async function main() {
     // }
 
 
-    // //     await sleep(30000)
+    await sleep(30000)
 
-    // //Verification on the Polygonscan Mumbai network
-    // //     await hre.run("verify:verify", {
-    // //         address: deployedFranceContract.address,
-    // //         constructorArguments: [],
-    // //         contract: "contracts/Tokens.sol:France"
-    // //     });
+    // Verification on the Polygonscan Mumbai network
+    await hre.run("verify:verify", {
+        address: deployedFranceContract.address,
+        constructorArguments: [initialValues[0]],
+        contract: "contracts/Tokens.sol:France"
+    });
 
-    // //Verification on the Polygonscan Mumbai network
-    // //     await hre.run("verify:verify", {
-    // //         address: deployedBrasilContract.address,
-    // //         constructorArguments: [],
-    // //         contract: "contracts/Tokens.sol:Brasil"
-    // //     });
+    // Verification on the Polygonscan Mumbai network
+    await hre.run("verify:verify", {
+        address: deployedBrasilContract.address,
+        constructorArguments: [initialValues[1]],
+        contract: "contracts/Tokens.sol:Brasil"
+    });
 
-    // //Verification on the Polygonscan Mumbai network
-    // //     await hre.run("verify:verify", {
-    // //         address: deployedSwapContract.address,
-    // //         constructorArguments: [deployedFranceContract.address, deployedBrasilContract.address],
-    // //         contract: "contracts/Swap.sol:Swap"
-    // //     });
+    // Verification on the Polygonscan Mumbai network
+    await hre.run("verify:verify", {
+        address: deployedSwapContract.address,
+        constructorArguments: [
+            deployedFranceContract.address,
+            deployedBrasilContract.address,
+            _LinkToken,
+            _LinkOracle
+        ],
+        contract: "contracts/Swap.sol:Swap"
+    });
 
 
     const calculOdds = (tokenReserveFrance, tokenReserveBrasil) => {

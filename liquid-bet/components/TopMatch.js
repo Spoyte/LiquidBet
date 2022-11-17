@@ -12,9 +12,10 @@ import {
 
 } from "../constants"
 import { useContractWrite, usePrepareContractWrite } from 'wagmi';
-import { ethers } from 'ethers'
+import { ethers, utils } from 'ethers'
 import { useState, useRef } from 'react';
 import Image from 'next/image';
+import { parseEther } from 'ethers/lib/utils';
 
 
 
@@ -33,11 +34,12 @@ const TopMatch = () => {
     const { address } = useAccount();
 
 
+
     const { config: brazilApproveConfig } = usePrepareContractWrite({
         address: BRAZIL_TOKEN_ADDRESS,
         abi: BRAZIL_TOKEN_ABI,
         functionName: "approve",
-        args: [SWAP_CONTRACT_ADDRESS, 10000000]
+        args: [SWAP_CONTRACT_ADDRESS, utils.parseEther("100000")]
     })
     const { write: brazilWrite } = useContractWrite(brazilApproveConfig);
 
@@ -49,7 +51,7 @@ const TopMatch = () => {
         address: FRANCE_TOKEN_ADDRESS,
         abi: FRANCE_TOKEN_ABI,
         functionName: "approve",
-        args: [SWAP_CONTRACT_ADDRESS, 10000000],
+        args: [SWAP_CONTRACT_ADDRESS, utils.parseEther("100000")],
 
     })
     const { write: franceWrite } = useContractWrite({
@@ -124,7 +126,7 @@ const TopMatch = () => {
 
 
                     <div>
-                        <span><Image src={france.src} width='50px'height='50px' alt="france flag" /></span>
+                        <span><Image src={france.src} width='50px' height='50px' alt="france flag" /></span>
                         <span>France</span>
                         <div className={styles.depositContainer}>
                             <p>Deposit Matic to place Bets</p>
@@ -149,8 +151,8 @@ const TopMatch = () => {
 
 
                     <div>
-                        
-                        <span><Image src={brazil.src} width='50px'height='50px' alt="brazil flag" /></span>
+
+                        <span><Image src={brazil.src} width='50px' height='50px' alt="brazil flag" /></span>
                         <span>Brazil</span>
                         <div className={styles.depositContainer}>
                             <p>Deposit Matic to place Bets</p>

@@ -17,7 +17,7 @@ import "@chainlink/contracts/src/v0.8/ConfirmedOwner.sol";
 *extra comment
 *WARNING I removed the ownable
 */
-contract Swap is ERC20, ChainlinkClient, ConfirmedOwner {
+contract Swap is ERC20, Ownable, ChainlinkClient {
   using Chainlink for Chainlink.Request;
 
   address public FranceTokenAddress;
@@ -57,7 +57,7 @@ contract Swap is ERC20, ChainlinkClient, ConfirmedOwner {
     address _BrasilTokenAddress,
     address _LinkToken,
     address _LinkOracle
-  ) ERC20("Liquidity Token", "LPT") ConfirmedOwner(msg.sender) {
+  ) ERC20("Liquidity Token", "LPT") {
     jobId = "fa38023e44a84b6384c9411401904997";
     setChainlinkToken(_LinkToken);
     setChainlinkOracle(_LinkOracle);
