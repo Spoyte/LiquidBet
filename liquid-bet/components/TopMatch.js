@@ -1,7 +1,7 @@
 import styles from '../styles/Home.module.css'
 import brazil from '../assets/brazil.svg'
 import france from '../assets/france.svg'
-import { useAccount } from 'wagmi';
+import { useAccount, useContractEvent, useContractRead, useContractReads, useContractWrite, usePrepareContractWrite } from 'wagmi';
 import {
     BRAZIL_TOKEN_ABI,
     BRAZIL_TOKEN_ADDRESS,
@@ -11,7 +11,7 @@ import {
     SWAP_CONTRACT_ABI,
 
 } from "../constants"
-import { useContractWrite, usePrepareContractWrite } from 'wagmi';
+
 import { ethers, utils } from 'ethers'
 import { useState, useRef } from 'react';
 import Image from 'next/image';
@@ -65,6 +65,7 @@ const TopMatch = () => {
         address: SWAP_CONTRACT_ADDRESS,
         abi: SWAP_CONTRACT_ABI,
         functionName: "gameOver",
+        enabled: false,
 
     })
     const { write: gameOverWrite } = useContractWrite({
@@ -78,6 +79,7 @@ const TopMatch = () => {
         address: SWAP_CONTRACT_ADDRESS,
         abi: SWAP_CONTRACT_ABI,
         functionName: "deposit_swapBRAtoFR",
+        enabled: false,
         overrides: {
             from: address,
             value: ethers.utils.parseEther(titleFR ? titleFR : "0.001")
@@ -94,6 +96,7 @@ const TopMatch = () => {
         address: SWAP_CONTRACT_ADDRESS,
         abi: SWAP_CONTRACT_ABI,
         functionName: "deposit_swapFRtoBRA",
+        enabled: false,
         overrides: {
             from: address,
             value: ethers.utils.parseEther(titleBRA ? titleBRA : "0.001")
@@ -107,6 +110,57 @@ const TopMatch = () => {
         }
     })
 
+    useContractEvent({
+        address: SWAP_CONTRACT_ADDRESS,
+        abi: SWAP_CONTRACT_ABI,
+        eventName: 'DepositMade',
+        enabled: false,
+        listener(userAddress, amount, tokenReceived, functionName) {
+            console.log(`User Address :${userAddress}`)
+            console.log(`Amount Deposit in Matic ${amount}`)
+            console.log(`Amount Received from the Swap${tokenReceived}`)
+            console.log(`Function called ${functionName}`)
+        },
+    })
+
+    const { data, isError, isLoading } = useContractReads({
+        // address: SWAP_CONTRACT_ADDRESS,
+        // abi: SWAP_CONTRACT_ABI,
+        // functionName: 'getReserveFrance',
+        // enabled: false,
+        contracts: [
+            {
+                address: SWAP_CONTRACT_ADDRESS,
+                abi: SWAP_CONTRACT_ABI,
+                functionName: 'getReserveFrance',
+            },
+            {
+                address: SWAP_CONTRACT_ADDRESS,
+                abi: SWAP_CONTRACT_ABI,
+                functionName: 'getReserveBrasil',
+            },
+        ]
+    })
+        // console.dir(data[0]._hex);
+        // console.dir(data[1]._hex);
+        // let info = (parseInt(data._hex, 16) / 1e18).toFixed(2)
+        ;
+    // console.log(`Get reserve France is ${(parseInt(data[0]._hex, 16) / 1e18).toFixed(2)}`);
+    // console.log(`Get reserve Brasil is ${(parseInt(data[1]._hex, 16) / 1e18).toFixed(2)}`);
+    // console.dir()
+
+
+    let odd_A = (parseInt(data[0]._hex, 16) / 1e18).toFixed(2)
+    odd_A = (odd_A / 10000) * 5.6
+    odd_A = parseFloat(odd_A).toFixed(2)
+    console.log(odd_A);
+
+    let odd_B = (parseInt(data[1]._hex, 16) / 1e18).toFixed(2)
+    odd_B = (odd_B / 10000) * 5.6
+    odd_B = parseFloat(odd_B).toFixed(2)
+    console.log(odd_B);
+
+
 
     return (
         <div className={styles.topmatch}>
@@ -114,6 +168,7 @@ const TopMatch = () => {
 
             <div className={styles.matches}>
                 <p>World cup - FIFA</p>
+                {/* <span>{info}</span> */}
                 <div>
                     <button className={styles.approve} ref={ref} onClick={() => {
                         brazilWrite()
@@ -128,12 +183,13 @@ const TopMatch = () => {
                     <div>
                         <span><Image src={france.src} width='50px' height='50px' alt="france flag" /></span>
                         <span>France</span>
+                        <div>{odd_A}</div>
                         <div className={styles.depositContainer}>
                             <p>Deposit Matic to place Bets</p>
                             <form>
                                 <input
                                     type='number'
-                                    titleFR="Amount of MATIC to deposit"
+                                    title="Amount of MATIC to deposit"
                                     placeholder='MATIC Amount'
                                     onChange={e => settitleFR(e.target.value)}
                                     value={titleFR}
@@ -154,12 +210,13 @@ const TopMatch = () => {
 
                         <span><Image src={brazil.src} width='50px' height='50px' alt="brazil flag" /></span>
                         <span>Brazil</span>
+                        <div>{odd_B}</div>
                         <div className={styles.depositContainer}>
                             <p>Deposit Matic to place Bets</p>
                             <form>
                                 <input
                                     type='number'
-                                    titleFR="Amount of MATIC to deposit"
+                                    title="Amount of MATIC to deposit"
                                     placeholder='MATIC Amount'
                                     onChange={e => settitleBRA(e.target.value)}
                                     value={titleBRA}
