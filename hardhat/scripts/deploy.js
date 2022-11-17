@@ -1,6 +1,9 @@
 const { ethers } = require('hardhat')
+const fs = require('fs');
 require("@nomiclabs/hardhat-ethers");
 require('dotenv').config({ path: '.env' });
+const fileName = './file.json';
+const file = require(fileName);
 const swap = require("../artifacts/contracts/Swap.sol/Swap.json")
 const france = require("../artifacts/contracts/Tokens.sol/France.json")
 const brasil = require("../artifacts/contracts/Tokens.sol/Brasil.json")
@@ -40,6 +43,7 @@ async function main() {
     const SwapContract = await ethers.getContractFactory('Swap')
     const deployedSwapContract = await SwapContract.deploy(deployedFranceContract.address, deployedBrasilContract.address)
     await deployedSwapContract.deployed()
+    const swapAddress = deployedSwapContract.address
     console.log('Swap Contract Address', deployedSwapContract.address)
     console.log("");
     console.log("");
@@ -57,8 +61,8 @@ async function main() {
 
 
     // Connnecting the Wallet  
-    const provider = new ethers.providers.JsonRpcProvider(NODE_PROVIDER_API_KEY_URL)
-    const wallet = new ethers.Wallet(WALLET_PRIVATE_KEY)
+    const provider = new ethers.providers.JsonRpcProvider(NODE_PROVIDER_TESTNET_URL)
+    const wallet = new ethers.Wallet(HARDHAT_TESTNET_PRIVATE_KEY)
     const signer = wallet.connect(provider)
     const swapABI = swap.abi;
     const _swapContract = new ethers.Contract(
@@ -77,6 +81,7 @@ async function main() {
             });
         })
     }
+
 
 
 

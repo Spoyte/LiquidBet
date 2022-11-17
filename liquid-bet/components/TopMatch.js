@@ -158,7 +158,7 @@ const TopMatch = () => {
                                     type='number'
                                     titleFR="Amount of MATIC to deposit"
                                     placeholder='MATIC Amount'
-                                    onChange={e => settitleFR(e.target.value)}
+                                    onChange={e => settitleBRA(e.target.value)}
                                     value={titleBRA}
                                 />
                                 <button onClick={(e) => {

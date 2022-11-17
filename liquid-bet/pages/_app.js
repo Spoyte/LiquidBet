@@ -20,10 +20,13 @@ import styles from '../styles/Home.module.css'
 
 
 const { chains, provider } = configureChains(
-  [chain.polygonMumbai],
+  [chain.hardhat],
   [
-    alchemyProvider({ apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY }),
+    alchemyProvider({
+      apiKey: "http://127.0.0.1:8545/"
+    }),
     publicProvider()
+    // process.env.NEXT_PUBLIC_ALCHEMY_KEY
   ]
 );
 const { connectors } = getDefaultWallets({
@@ -39,16 +42,16 @@ const wagmiClient = createClient({
 function MyApp({ Component, pageProps }) {
   return (
     <WagmiConfig client={wagmiClient}>
-      <RainbowKitProvider chains={chains} 
+      <RainbowKitProvider chains={chains}
         theme={lightTheme({
           accentColor: '#0047FF',
           accentColorForeground: '#FFFFFF',
           borderRadius: 'small',
         })}
       >
-        <Navbar/>
+        <Navbar />
         <Component {...pageProps} />
-        <Footer/>
+        <Footer />
       </RainbowKitProvider>
     </WagmiConfig>
   )
