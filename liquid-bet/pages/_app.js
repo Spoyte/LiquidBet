@@ -23,7 +23,7 @@ const { chains, provider } = configureChains(
   [chain.polygonMumbai],
   [
     alchemyProvider({
-      apiKey: process.env.NODE_PROVIDER_API_KEY_URL
+      apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY
       // process.env.NODE_PROVIDER_API_KEY_URL
       // "http://127.0.0.1:8545/"
     }),
