@@ -14,7 +14,7 @@ import {
 import { useContractWrite, usePrepareContractWrite } from 'wagmi';
 import { ethers } from 'ethers'
 import { useState, useRef } from 'react';
-
+import Image from 'next/image';
 
 
 
@@ -124,7 +124,7 @@ const TopMatch = () => {
 
 
                     <div>
-                        <span><img src={france.src} width='50px' alt="france flag" /></span>
+                        <span><Image src={france.src} width='50px'height='50px' alt="france flag" /></span>
                         <span>France</span>
                         <div className={styles.depositContainer}>
                             <p>Deposit Matic to place Bets</p>
@@ -149,7 +149,8 @@ const TopMatch = () => {
 
 
                     <div>
-                        <span><img src={brazil.src} width='50px' alt="brazil flag" /></span>
+                        
+                        <span><Image src={brazil.src} width='50px'height='50px' alt="brazil flag" /></span>
                         <span>Brazil</span>
                         <div className={styles.depositContainer}>
                             <p>Deposit Matic to place Bets</p>
@@ -170,9 +171,9 @@ const TopMatch = () => {
                     </div>
 
 
-                    <button onClick={() => gameOverWrite()} >
-
-                        I'm the Game Over Function() </button>
+                    <button onClick={() => gameOverWrite()}>
+                        The Game Over Function
+                    </button>
                 </div>
             </div>
         </div>
