@@ -2,8 +2,7 @@ const { ethers } = require('hardhat')
 const fs = require('fs');
 require("@nomiclabs/hardhat-ethers");
 require('dotenv').config({ path: '.env' });
-const fileName = './file.json';
-const file = require(fileName);
+
 const swap = require("../artifacts/contracts/Swap.sol/Swap.json")
 const france = require("../artifacts/contracts/Tokens.sol/France.json")
 const brasil = require("../artifacts/contracts/Tokens.sol/Brasil.json")
