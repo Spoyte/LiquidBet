@@ -13,8 +13,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 extra comment
 */
 contract France is ERC20 {
-  constructor() ERC20("France", "FR") {
-    _mint(msg.sender, 10000 * 10**decimals());
+  constructor(uint16 oddTeam) ERC20("France", "FR") {
+    _mint(msg.sender, oddTeam * 10**decimals());
   }
 
   bool isSmartContractOwnerSet = false;
@@ -54,8 +54,8 @@ contract France is ERC20 {
  *@dev: Will create 10000 tokens and can mint more later.
  */
 contract Brasil is ERC20 {
-  constructor() ERC20("Brasil", "BRA") {
-    _mint(msg.sender, 10000 * 10**decimals());
+  constructor(uint16 oddTeam) ERC20("Brasil", "BRA") {
+    _mint(msg.sender, oddTeam * 10**decimals());
   }
 
   bool isSmartContractOwnerSet = false;
