@@ -22,6 +22,9 @@ contract Swap is ERC20, ChainlinkClient, ConfirmedOwner {
 
   address public FranceTokenAddress;
   address public BrasilTokenAddress;
+  //Will be 1 for France/Home win, 2 for Draw and 3 for Brasil/Away win.
+  //Will be send a value at the end of the match.
+  uint256 public FinalResult = 0;
 
   /* chainlink params */
   bytes32 private jobId;
@@ -93,6 +96,12 @@ contract Swap is ERC20, ChainlinkClient, ConfirmedOwner {
         );
         homeScore = homeResponse;
         awayScore = awayResponse;
+        if(homeScore > awayScore)
+          FinalResult = 1;
+        else if (homeScore == awayScore)
+          FinalResult = 2;
+        else
+          FinalResult = 3;
     }
 
     function withdrawLink() public onlyOwner {
@@ -256,10 +265,6 @@ contract Swap is ERC20, ChainlinkClient, ConfirmedOwner {
   function contractBalance() public view returns (uint256) {
     return address(this).balance;
   }
-
-  //Will be 1 for France win, 2 for Draw and 3 for Brasil's win.
-  //Will be send a value at the end of the match.
-  uint256 public FinalResult = 1;
 
   // Allow us to test the final result before connecting to the Chainlink Node
   function setFinalResult(uint256 _winner) public {
