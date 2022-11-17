@@ -20,13 +20,14 @@ import styles from '../styles/Home.module.css'
 
 
 const { chains, provider } = configureChains(
-  [chain.hardhat],
+  [chain.polygonMumbai],
   [
     alchemyProvider({
-      apiKey: "http://127.0.0.1:8545/"
+      apiKey: process.env.NODE_PROVIDER_API_KEY_URL
+      // process.env.NODE_PROVIDER_API_KEY_URL
+      // "http://127.0.0.1:8545/"
     }),
     publicProvider()
-    // process.env.NEXT_PUBLIC_ALCHEMY_KEY
   ]
 );
 const { connectors } = getDefaultWallets({

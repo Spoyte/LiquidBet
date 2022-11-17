@@ -5,8 +5,8 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./Tokens.sol";
 
-import '@chainlink/contracts/src/v0.8/ChainlinkClient.sol';
-import '@chainlink/contracts/src/v0.8/ConfirmedOwner.sol';
+import "@chainlink/contracts/src/v0.8/ChainlinkClient.sol";
+import "@chainlink/contracts/src/v0.8/ConfirmedOwner.sol";
 
 /*
 *@Authors: Paul Birnbaum, Spoyte.
@@ -43,10 +43,12 @@ contract Swap is ERC20, ChainlinkClient, ConfirmedOwner {
    *_LinkOracle = 0x915dc8cbcf3F17faa33F20B88e6d5D162195E0b2    (own oracle)
    *_JobId = fa38023e44a84b6384c9411401904997                   2 results home/away based on sportdataio
    */
-  constructor(address _FranceTokenAddress, address _BrasilTokenAddress, address _LinkToken, address _LinkOracle)
-    ERC20("Liquidity Token", "LPT")
-    ConfirmedOwner(msg.sender)
-  {
+  constructor(
+    address _FranceTokenAddress,
+    address _BrasilTokenAddress,
+    address _LinkToken,
+    address _LinkOracle
+  ) ERC20("Liquidity Token", "LPT") ConfirmedOwner(msg.sender) {
     FranceTokenAddress = _FranceTokenAddress;
     BrasilTokenAddress = _BrasilTokenAddress;
     setChainlinkToken(_LinkToken);
@@ -57,51 +59,50 @@ contract Swap is ERC20, ChainlinkClient, ConfirmedOwner {
 
   /*chainlink functions*/
 
-    /**
-     * @notice Request mutiple parameters from the oracle in a single transaction
-     */
-    function requestMultipleParameters() public {
-        Chainlink.Request memory req = buildChainlinkRequest(
-            jobId,
-            address(this),
-            this.fulfillMultipleParameters.selector
-        );
-        req.add(
-            "urlRESULT",
-            "https://api.sportsdata.io/v3/soccer/scores/json/GamesByDate/2022-11-15?key=a5acc6cc44dc47fc9918198d29b33e00"
-        );
-        req.add("pathHOME", "0,HomeTeamScore");
+  /**
+   * @notice Request mutiple parameters from the oracle in a single transaction
+   */
+  function requestMultipleParameters() public {
+    Chainlink.Request memory req = buildChainlinkRequest(
+      jobId,
+      address(this),
+      this.fulfillMultipleParameters.selector
+    );
+    req.add(
+      "urlRESULT",
+      "https://api.sportsdata.io/v3/soccer/scores/json/GamesByDate/2022-11-15?key=a5acc6cc44dc47fc9918198d29b33e00"
+    );
+    req.add("pathHOME", "0,HomeTeamScore");
 
-        req.add("pathAWAY", "0,AwayTeamScore");
+    req.add("pathAWAY", "0,AwayTeamScore");
 
-        sendChainlinkRequest(req, fee); // MWR API.
-    }
+    sendChainlinkRequest(req, fee); // MWR API.
+  }
 
-    /**
-     * @notice Fulfillment function for multiple parameters in a single request
-     * @dev This is called by the oracle. recordChainlinkFulfillment must be used.
-     */
-    function fulfillMultipleParameters(
-        bytes32 requestId,
-        uint256 homeResponse,
-        uint256 awayResponse
-    ) public recordChainlinkFulfillment(requestId) {
-        emit RequestMultipleFulfilled(
-            requestId,
-            homeResponse,
-            awayResponse
-        );
-        homeScore = homeResponse;
-        awayScore = awayResponse;
-    }
+  /**
+   * @notice Fulfillment function for multiple parameters in a single request
+   * @dev This is called by the oracle. recordChainlinkFulfillment must be used.
+   */
+  function fulfillMultipleParameters(
+    bytes32 requestId,
+    uint256 homeResponse,
+    uint256 awayResponse
+  ) public recordChainlinkFulfillment(requestId) {
+    emit RequestMultipleFulfilled(requestId, homeResponse, awayResponse);
+    homeScore = homeResponse;
+    awayScore = awayResponse;
 
-    function withdrawLink() public onlyOwner {
-        LinkTokenInterface link = LinkTokenInterface(chainlinkTokenAddress());
-        require(
-            link.transfer(msg.sender, link.balanceOf(address(this))),
-            "Unable to transfer"
-        );
-    }
+    // IF STATEMENT
+  }
+
+  function withdrawLink() public onlyOwner {
+    LinkTokenInterface link = LinkTokenInterface(chainlinkTokenAddress());
+    require(
+      link.transfer(msg.sender, link.balanceOf(address(this))),
+      "Unable to transfer"
+    );
+  }
+
   /*end of chainlink functions*/
 
   /*
@@ -237,6 +238,7 @@ contract Swap is ERC20, ChainlinkClient, ConfirmedOwner {
         balanceFranceToken >= contractBalance(),
         "There is not Enought Matic in the Contract"
       );
+      uint256 balanceFranceToken_after = balanceFranceToken;
       ERC20(FranceTokenAddress).transferFrom(
         msg.sender,
         address(this),
@@ -247,13 +249,16 @@ contract Swap is ERC20, ChainlinkClient, ConfirmedOwner {
         address(this),
         balanceBrasilToken
       );
-      (bool sent, ) = payable(msg.sender).call{ value: balanceFranceToken }("");
+      (bool sent, ) = payable(msg.sender).call{
+        value: balanceFranceToken_after
+      }("");
       require(sent, "Failed to send Ether");
     } else if (FinalResult == 3) {
       require(
         balanceBrasilToken >= contractBalance(),
         "There is not Enought Matic in the Contract"
       );
+      uint256 balanceBrasilToken_after = balanceBrasilToken;
       ERC20(BrasilTokenAddress).transferFrom(
         msg.sender,
         address(this),
@@ -264,23 +269,30 @@ contract Swap is ERC20, ChainlinkClient, ConfirmedOwner {
         address(this),
         balanceFranceToken
       );
-      (bool sent, ) = payable(msg.sender).call{ value: balanceBrasilToken }("");
+      (bool sent, ) = payable(msg.sender).call{
+        value: balanceBrasilToken_after
+      }("");
       require(sent, "Failed to send Ether");
     }
-    //In case of a draw, EXPERIMENTAL
-    // else if (FinalResult == 2) {
-    //   ERC20(FranceTokenAddress).transferFrom(
-    //     msg.sender,
-    //     address(this),
-    //     balanceFranceToken
-    //   );
-    //   ERC20(BrasilTokenAddress).transferFrom(
-    //     msg.sender,
-    //     address(this),
-    //     balanceBrasilToken
-    //   );
-    //   (bool sent, ) = payable(msg.sender).call{ value: contractBalance() }("");
-    //   require(sent,"Failed to send Ether");
-    // }
+    // In case of a draw, EXPERIMENTAL
+    else if (FinalResult == 2) {
+      uint256 balanceFranceToken_after = balanceFranceToken;
+      uint256 balanceBrasilToken_after = balanceBrasilToken;
+      ERC20(FranceTokenAddress).transferFrom(
+        msg.sender,
+        address(this),
+        getBalanceWalletFrance
+      );
+      ERC20(BrasilTokenAddress).transferFrom(
+        msg.sender,
+        address(this),
+        getBalanceWalletBrasil
+      );
+
+      (bool sent, ) = payable(msg.sender).call{
+        value: (balanceBrasilToken_after * balanceFranceToken_after) / 2
+      }("");
+      require(sent, "Failed to send Ether");
+    }
   }
 }
