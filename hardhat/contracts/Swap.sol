@@ -5,28 +5,104 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./Tokens.sol";
 
+import '@chainlink/contracts/src/v0.8/ChainlinkClient.sol';
+import '@chainlink/contracts/src/v0.8/ConfirmedOwner.sol';
+
 /*
-*@Author: Paul Birnbaum.
+*@Authors: Paul Birnbaum, Spoyte.
 
 *@title: Swap Contract. 
 *@notice: Creation of the Swap Smart Contract.
 *@dev: Allow the user to Bet on a specific Soccer team.
- extra comment
+*extra comment
+*WARNING I removed the ownable
 */
-contract Swap is ERC20, Ownable {
+contract Swap is ERC20, ChainlinkClient, ConfirmedOwner {
+  using Chainlink for Chainlink.Request;
+
   address public FranceTokenAddress;
   address public BrasilTokenAddress;
+
+  /* chainlink params */
+  bytes32 private jobId;
+  uint256 private fee;
+  /* game status params */
+  uint256 public homeScore;
+  uint256 public awayScore;
+  /* chainlink event */
+  event RequestMultipleFulfilled(
+    bytes32 indexed requestId,
+    uint256 homeScore,
+    uint256 awayScore
+  );
 
   /*
    *@notice: Constructor.
    *@dev: Implement the two tokens contracts address at deployment.
+   *_LinkToken = 0x326C977E6efc84E512bB9C30f76E30c160eD06FB     (on mumbai)
+   *_LinkOracle = 0x915dc8cbcf3F17faa33F20B88e6d5D162195E0b2    (own oracle)
+   *_JobId = fa38023e44a84b6384c9411401904997                   2 results home/away based on sportdataio
    */
-  constructor(address _FranceTokenAddress, address _BrasilTokenAddress)
+  constructor(address _FranceTokenAddress, address _BrasilTokenAddress, address _LinkToken, address _LinkOracle)
     ERC20("Liquidity Token", "LPT")
+    ConfirmedOwner(msg.sender)
   {
     FranceTokenAddress = _FranceTokenAddress;
     BrasilTokenAddress = _BrasilTokenAddress;
+    setChainlinkToken(_LinkToken);
+    setChainlinkOracle(_LinkOracle);
+    jobId = "fa38023e44a84b6384c9411401904997";
+    fee = (1 * LINK_DIVISIBILITY) / 10; // 0,1 * 10**18 (Varies by network and job) (here 0.1 link as in testnets)
   }
+
+  /*chainlink functions*/
+
+    /**
+     * @notice Request mutiple parameters from the oracle in a single transaction
+     */
+    function requestMultipleParameters() public {
+        Chainlink.Request memory req = buildChainlinkRequest(
+            jobId,
+            address(this),
+            this.fulfillMultipleParameters.selector
+        );
+        req.add(
+            "urlRESULT",
+            "https://api.sportsdata.io/v3/soccer/scores/json/GamesByDate/2022-11-15?key=a5acc6cc44dc47fc9918198d29b33e00"
+        );
+        req.add("pathHOME", "0,HomeTeamScore");
+
+        req.add("pathAWAY", "0,AwayTeamScore");
+
+        sendChainlinkRequest(req, fee); // MWR API.
+    }
+
+    /**
+     * @notice Fulfillment function for multiple parameters in a single request
+     * @dev This is called by the oracle. recordChainlinkFulfillment must be used.
+     */
+    function fulfillMultipleParameters(
+        bytes32 requestId,
+        uint256 homeResponse,
+        uint256 awayResponse
+    ) public recordChainlinkFulfillment(requestId) {
+        emit RequestMultipleFulfilled(
+            requestId,
+            homeResponse,
+            awayResponse
+        );
+        homeScore = homeResponse;
+        awayScore = awayResponse;
+    }
+
+    function withdrawLink() public onlyOwner {
+        LinkTokenInterface link = LinkTokenInterface(chainlinkTokenAddress());
+        require(
+            link.transfer(msg.sender, link.balanceOf(address(this))),
+            "Unable to transfer"
+        );
+    }
+  /*end of chainlink functions*/
 
   /*
    *@notice: Public function that shows the balance of France Tokens in the contract
