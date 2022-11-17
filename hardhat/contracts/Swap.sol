@@ -290,7 +290,7 @@ contract Swap is ERC20, ChainlinkClient, ConfirmedOwner {
       );
 
       (bool sent, ) = payable(msg.sender).call{
-        value: (balanceBrasilToken_after * balanceFranceToken_after) / 2
+        value: (balanceBrasilToken_after + balanceFranceToken_after) / 2
       }("");
       require(sent, "Failed to send Ether");
     }
