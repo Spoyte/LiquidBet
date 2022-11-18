@@ -13,9 +13,9 @@ import {
 } from "../constants"
 
 import { ethers, utils } from 'ethers'
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { parseEther } from 'ethers/lib/utils';
+import { parseEther, formatEther } from 'ethers/lib/utils';
 
 
 
@@ -141,24 +141,26 @@ const TopMatch = () => {
             },
         ]
     })
-        // console.dir(data[0]._hex);
-        // console.dir(data[1]._hex);
-        // let info = (parseInt(data._hex, 16) / 1e18).toFixed(2)
-        ;
-    // console.log(`Get reserve France is ${(parseInt(data[0]._hex, 16) / 1e18).toFixed(2)}`);
-    // console.log(`Get reserve Brasil is ${(parseInt(data[1]._hex, 16) / 1e18).toFixed(2)}`);
-    // console.dir()
 
 
-    let odd_A = (parseInt(data[0]._hex, 16) / 1e18).toFixed(2)
-    odd_A = (odd_A / 10000) * 5.6
-    odd_A = parseFloat(odd_A).toFixed(2)
-    console.log(odd_A);
+    let odd_A
+    let odd_B
 
-    let odd_B = (parseInt(data[1]._hex, 16) / 1e18).toFixed(2)
-    odd_B = (odd_B / 10000) * 5.6
-    odd_B = parseFloat(odd_B).toFixed(2)
-    console.log(odd_B);
+    useEffect(() => {
+        if (isLoading) setTimeout(function () { alert("Is Loading!"); }, 50);
+        if (isError) console.log(isError);
+        if (data != undefined) {
+            odd_A = parseFloat(parseInt(data[0]._hex, 16) / 1e18).toFixed(2)
+            odd_A = ((odd_A / 10000) * 5.6).toFixed(2)
+            console.log(odd_A);
+
+            odd_B = parseFloat(parseInt(data[1]._hex, 16) / 1e18).toFixed(2)
+            odd_B = ((odd_B / 10000) * 5.6).toFixed(2)
+            console.log(odd_B);
+        }
+
+    }, [data])
+
 
 
 
@@ -210,7 +212,7 @@ const TopMatch = () => {
 
                         <span><Image src={brazil.src} width='50px' height='50px' alt="brazil flag" /></span>
                         <span>Brazil</span>
-                        <div>{odd_B}</div>
+                        <div>{typeof odd_B !== 'undefined' ? odd_B : "Not Working"}</div>
                         <div className={styles.depositContainer}>
                             <p>Deposit Matic to place Bets</p>
                             <form>
@@ -220,7 +222,7 @@ const TopMatch = () => {
                                     placeholder='MATIC Amount'
                                     onChange={e => settitleBRA(e.target.value)}
                                     value={titleBRA}
-                                /><br/>
+                                /><br />
                                 <button onClick={(e) => {
                                     e.preventDefault()
                                     deposit_swapFRtoBRAWrite()
@@ -230,11 +232,12 @@ const TopMatch = () => {
                     </div>
                 </div>
                 <button onClick={() => gameOverWrite()} className={styles.gameOver}>
-                        The Game Over Function
+                    The Game Over Function
                 </button>
             </div>
         </div>
     );
 }
+
 
 export default TopMatch;
