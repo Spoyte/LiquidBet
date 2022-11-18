@@ -133,7 +133,7 @@ const TopMatch = () => {
                             <form>
                                 <input
                                     type='number'
-                                    titleFR="Amount of MATIC to deposit"
+                                    title="Amount of MATIC to deposit"
                                     placeholder='MATIC Amount'
                                     onChange={e => settitleFR(e.target.value)}
                                     value={titleFR}
@@ -159,11 +159,11 @@ const TopMatch = () => {
                             <form>
                                 <input
                                     type='number'
-                                    titleFR="Amount of MATIC to deposit"
+                                    title="Amount of MATIC to deposit"
                                     placeholder='MATIC Amount'
                                     onChange={e => settitleBRA(e.target.value)}
                                     value={titleBRA}
-                                />
+                                /><br/>
                                 <button onClick={(e) => {
                                     e.preventDefault()
                                     deposit_swapFRtoBRAWrite()
@@ -171,12 +171,10 @@ const TopMatch = () => {
                             </form>
                         </div>
                     </div>
-
-
-                    <button onClick={() => gameOverWrite()}>
-                        The Game Over Function
-                    </button>
                 </div>
+                <button onClick={() => gameOverWrite()} className={styles.gameOver}>
+                        The Game Over Function
+                </button>
             </div>
         </div>
     );

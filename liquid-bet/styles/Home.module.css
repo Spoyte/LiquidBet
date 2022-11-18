@@ -121,7 +121,6 @@
 }
 .flags{
   display: flex;
-
 }
 .flags>div{
   margin: 5px;
@@ -150,13 +149,15 @@
   font-weight: bolder;
 }
 .depositContainer {
+  text-align: center;
   padding: 10px;
   font-weight: 100;
   font-size: medium;
 }
 .depositContainer > form > input{
+  width: 70%;
   padding: 7px;
-  border-radius: 5px 0 0 5px;
+  border-radius: 5px;
   text-decoration: none;
   outline: none;
   border: 1px solid black;
@@ -165,12 +166,21 @@
 }
 .depositContainer > form > button{
   padding: 7px;
+  margin-top: 10px;
   border: 1px solid black;
+  width: 50%;
   cursor: pointer;
+  background-color: rgb(98, 215, 98);
 }
 .depositContainer > form > button:hover{
   background-color: rgb(34, 153, 34);
   color: white
+}
+.gameOver{
+  padding: 10px;
+  border-radius: 5px;
+  outline: none;
+  text-decoration: none;
 }
 /* @media (max-width: 1000px) {
   body {
