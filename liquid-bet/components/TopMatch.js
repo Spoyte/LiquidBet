@@ -125,37 +125,37 @@ const TopMatch = () => {
         },
     })
 
-    const { data, isError, isLoading } = useContractReads({
+    // const { data, isError, isLoading } = useContractReads({
 
-        contracts: [
-            {
-                address: SWAP_CONTRACT_ADDRESS,
-                abi: SWAP_CONTRACT_ABI,
-                functionName: 'getReserveFrance',
-            },
-            {
-                address: SWAP_CONTRACT_ADDRESS,
-                abi: SWAP_CONTRACT_ABI,
-                functionName: 'getReserveBrasil',
-            },
-        ]
-    })
+    //     contracts: [
+    //         {
+    //             address: SWAP_CONTRACT_ADDRESS,
+    //             abi: SWAP_CONTRACT_ABI,
+    //             functionName: 'getReserveFrance',
+    //         },
+    //         {
+    //             address: SWAP_CONTRACT_ADDRESS,
+    //             abi: SWAP_CONTRACT_ABI,
+    //             functionName: 'getReserveBrasil',
+    //         },
+    //     ]
+    // })
 
 
 
-    const setodds = () => {
-        if (isLoading) setTimeout(function () { console.log("isLoading ...") }, 500);
-        else if (isError) console.log(isError);
-        else if (typeof data != 'undefined') {
-            oddsA = parseFloat(parseInt(data[0]._hex, 16) / 1e18).toFixed(2)
-            oddsA = ((oddsA / 10000) * 5.6).toFixed(2)
-            setOddsA(oddsA)
+    // const setodds = () => {
+    //     if (isLoading) setTimeout(function () { console.log("isLoading ...") }, 500);
+    //     else if (isError) console.log(isError);
+    //     else if (typeof data != 'undefined') {
+    //         oddsA = parseFloat(parseInt(data[0]._hex, 16) / 1e18).toFixed(2)
+    //         oddsA = ((oddsA / 10000) * 5.6).toFixed(2)
+    //         setOddsA(oddsA)
 
-            oddsB = parseFloat(parseInt(data[1]._hex, 16) / 1e18).toFixed(2)
-            oddsB = ((oddsB / 10000) * 5.6).toFixed(2)
-            setOddsB(oddsB)
-        }
-    }
+    //         oddsB = parseFloat(parseInt(data[1]._hex, 16) / 1e18).toFixed(2)
+    //         oddsB = ((oddsB / 10000) * 5.6).toFixed(2)
+    //         setOddsB(oddsB)
+    //     }
+    // }
 
 
 
@@ -181,7 +181,7 @@ const TopMatch = () => {
                     <div>
                         <span><Image src={france.src} width='50px' height='50px' alt="france flag" /></span>
                         <span>France</span>
-                        <div>{oddsA}</div>
+                        {/* <div>{oddsA}</div> */}
                         <div className={styles.depositContainer}>
                             <p>Deposit Matic to place Bets</p>
                             <form>
@@ -194,7 +194,6 @@ const TopMatch = () => {
                                 />
                                 <button onClick={(e) => {
                                     e.preventDefault()
-
                                     deposit_swapBRAtoFRWrite()
                                 }}
                                 >Deposit</button>
@@ -210,7 +209,7 @@ const TopMatch = () => {
 
                         <span><Image src={brazil.src} width='50px' height='50px' alt="brazil flag" /></span>
                         <span>Brazil</span>
-                        <div>{oddsB}</div>
+                        {/* <div>{oddsB}</div> */}
                         <div className={styles.depositContainer}>
                             <p>Deposit Matic to place Bets</p>
                             <form>
