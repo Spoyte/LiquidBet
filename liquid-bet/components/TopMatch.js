@@ -143,23 +143,23 @@ const TopMatch = () => {
     })
 
 
-    let odd_A
-    let odd_B
+    // let odd_A
+    // let odd_B
 
-    useEffect(() => {
-        if (isLoading) setTimeout(function () { alert("Is Loading!"); }, 50);
-        if (isError) console.log(isError);
-        if (data != undefined) {
-            odd_A = parseFloat(parseInt(data[0]._hex, 16) / 1e18).toFixed(2)
-            odd_A = ((odd_A / 10000) * 5.6).toFixed(2)
-            console.log(odd_A);
+    // useEffect(() => {
+    //     if (isLoading) setTimeout(function () { alert("Is Loading!"); }, 50);
+    //     if (isError) console.log(isError);
+    //     if (data != undefined) {
+    //         odd_A = parseFloat(parseInt(data[0]._hex, 16) / 1e18).toFixed(2)
+    //         odd_A = ((odd_A / 10000) * 5.6).toFixed(2)
+    //         console.log(odd_A);
 
-            odd_B = parseFloat(parseInt(data[1]._hex, 16) / 1e18).toFixed(2)
-            odd_B = ((odd_B / 10000) * 5.6).toFixed(2)
-            console.log(odd_B);
-        }
+    //         odd_B = parseFloat(parseInt(data[1]._hex, 16) / 1e18).toFixed(2)
+    //         odd_B = ((odd_B / 10000) * 5.6).toFixed(2)
+    //         console.log(odd_B);
+    //     }
 
-    }, [data])
+    // }, [data])
 
 
 
@@ -185,7 +185,7 @@ const TopMatch = () => {
                     <div>
                         <span><Image src={france.src} width='50px' height='50px' alt="france flag" /></span>
                         <span>France</span>
-                        <div>{odd_A}</div>
+                        {/* <div>{odd_A}</div> */}
                         <div className={styles.depositContainer}>
                             <p>Deposit Matic to place Bets</p>
                             <form>
@@ -212,7 +212,7 @@ const TopMatch = () => {
 
                         <span><Image src={brazil.src} width='50px' height='50px' alt="brazil flag" /></span>
                         <span>Brazil</span>
-                        <div>{typeof odd_B !== 'undefined' ? odd_B : "Not Working"}</div>
+                        {/* <div>{typeof odd_B !== 'undefined' ? odd_B : "Not Working"}</div> */}
                         <div className={styles.depositContainer}>
                             <p>Deposit Matic to place Bets</p>
                             <form>
