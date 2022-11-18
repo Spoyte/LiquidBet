@@ -112,18 +112,18 @@ const TopMatch = () => {
         }
     })
 
-    useContractEvent({
-        address: SWAP_CONTRACT_ADDRESS,
-        abi: SWAP_CONTRACT_ABI,
-        eventName: 'DepositMade',
-        enabled: false,
-        listener(userAddress, amount, tokenReceived, functionName) {
-            console.log(`User Address :${userAddress}`)
-            console.log(`Amount Deposit in Matic ${amount}`)
-            console.log(`Amount Received from the Swap${tokenReceived}`)
-            console.log(`Function called ${functionName}`)
-        },
-    })
+    // useContractEvent({
+    //     address: SWAP_CONTRACT_ADDRESS,
+    //     abi: SWAP_CONTRACT_ABI,
+    //     eventName: 'DepositMade',
+    //     enabled: false,
+    //     listener(userAddress, amount, tokenReceived, functionName) {
+    //         console.log(`User Address :${userAddress}`)
+    //         console.log(`Amount Deposit in Matic ${amount}`)
+    //         console.log(`Amount Received from the Swap${tokenReceived}`)
+    //         console.log(`Function called ${functionName}`)
+    //     },
+    // })
 
     // const { data, isError, isLoading } = useContractReads({
 
@@ -170,7 +170,7 @@ const TopMatch = () => {
                     <button className={styles.approve} ref={ref} onClick={() => {
                         brazilWrite()
                         franceWrite()
-                        setodds()
+                        // setodds()
                     }}>
                         Approve before deposit
                     </button>
@@ -209,7 +209,6 @@ const TopMatch = () => {
 
                         <span><Image src={brazil.src} width='50px' height='50px' alt="brazil flag" /></span>
                         <span>Brazil</span>
-                        {/* <div>{oddsB}</div> */}
                         <div className={styles.depositContainer}>
                             <p>Deposit Matic to place Bets</p>
                             <form>
@@ -222,7 +221,7 @@ const TopMatch = () => {
                                 /><br />
                                 <button onClick={(e) => {
                                     e.preventDefault()
-                                    setodds()
+                                    // setodds()
                                     deposit_swapFRtoBRAWrite()
                                 }}
                                 > Deposit</button>
