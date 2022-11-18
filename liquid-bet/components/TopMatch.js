@@ -24,6 +24,8 @@ const TopMatch = () => {
 
     const [titleFR, settitleFR] = useState("")
     const [titleBRA, settitleBRA] = useState("")
+    const [oddsA, setOddsA] = useState(0)
+    const [oddsB, setOddsB] = useState(0)
     const ref = useRef(null);
     const disableApproveBtn = () => {
         ref.current.hidden = true;
@@ -124,10 +126,7 @@ const TopMatch = () => {
     })
 
     const { data, isError, isLoading } = useContractReads({
-        // address: SWAP_CONTRACT_ADDRESS,
-        // abi: SWAP_CONTRACT_ABI,
-        // functionName: 'getReserveFrance',
-        // enabled: false,
+
         contracts: [
             {
                 address: SWAP_CONTRACT_ADDRESS,
@@ -143,24 +142,20 @@ const TopMatch = () => {
     })
 
 
-    // let odd_A
-    // let odd_B
 
-    // useEffect(() => {
-    //     if (isLoading) setTimeout(function () { alert("Is Loading!"); }, 50);
-    //     if (isError) console.log(isError);
-    //     if (data != undefined) {
-    //         odd_A = parseFloat(parseInt(data[0]._hex, 16) / 1e18).toFixed(2)
-    //         odd_A = ((odd_A / 10000) * 5.6).toFixed(2)
-    //         console.log(odd_A);
+    const setodds = () => {
+        if (isLoading) setTimeout(function () { console.log("isLoading ...") }, 500);
+        else if (isError) console.log(isError);
+        else if (typeof data != 'undefined') {
+            oddsA = parseFloat(parseInt(data[0]._hex, 16) / 1e18).toFixed(2)
+            oddsA = ((oddsA / 10000) * 5.6).toFixed(2)
+            setOddsA(oddsA)
 
-    //         odd_B = parseFloat(parseInt(data[1]._hex, 16) / 1e18).toFixed(2)
-    //         odd_B = ((odd_B / 10000) * 5.6).toFixed(2)
-    //         console.log(odd_B);
-    //     }
-
-    // }, [data])
-
+            oddsB = parseFloat(parseInt(data[1]._hex, 16) / 1e18).toFixed(2)
+            oddsB = ((oddsB / 10000) * 5.6).toFixed(2)
+            setOddsB(oddsB)
+        }
+    }
 
 
 
@@ -175,6 +170,7 @@ const TopMatch = () => {
                     <button className={styles.approve} ref={ref} onClick={() => {
                         brazilWrite()
                         franceWrite()
+                        setodds()
                     }}>
                         Approve before deposit
                     </button>
@@ -185,7 +181,7 @@ const TopMatch = () => {
                     <div>
                         <span><Image src={france.src} width='50px' height='50px' alt="france flag" /></span>
                         <span>France</span>
-                        {/* <div>{odd_A}</div> */}
+                        <div>{oddsA}</div>
                         <div className={styles.depositContainer}>
                             <p>Deposit Matic to place Bets</p>
                             <form>
@@ -198,8 +194,10 @@ const TopMatch = () => {
                                 />
                                 <button onClick={(e) => {
                                     e.preventDefault()
+
                                     deposit_swapBRAtoFRWrite()
-                                }}>Deposit</button>
+                                }}
+                                >Deposit</button>
                             </form>
                         </div>
                     </div>
@@ -212,7 +210,7 @@ const TopMatch = () => {
 
                         <span><Image src={brazil.src} width='50px' height='50px' alt="brazil flag" /></span>
                         <span>Brazil</span>
-                        {/* <div>{typeof odd_B !== 'undefined' ? odd_B : "Not Working"}</div> */}
+                        <div>{oddsB}</div>
                         <div className={styles.depositContainer}>
                             <p>Deposit Matic to place Bets</p>
                             <form>
@@ -225,8 +223,10 @@ const TopMatch = () => {
                                 /><br />
                                 <button onClick={(e) => {
                                     e.preventDefault()
+                                    setodds()
                                     deposit_swapFRtoBRAWrite()
-                                }}>Deposit</button>
+                                }}
+                                > Deposit</button>
                             </form>
                         </div>
                     </div>
@@ -238,6 +238,7 @@ const TopMatch = () => {
         </div>
     );
 }
+
 
 
 export default TopMatch;
