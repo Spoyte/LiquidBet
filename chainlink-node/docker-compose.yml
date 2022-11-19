@@ -1,0 +1,20 @@
+services:
+  pg_chainlink:
+    image: "postgres"
+    ports:
+      - "5432:5432"
+    env_file:
+      - database.env
+    volumes:
+      - /mnt/c/Users/noede/Documents/Chainlink-HackFall22/.chainlink-goerli/data:/var/lib/postgressql/data/
+  chainlink:
+    image: "smartcontract/chainlink:1.9.0-root"
+    env_file:
+      - .env
+    depends_on:
+      - pg_chainlink
+    ports:
+      - "6688:6688"
+    volumes:
+      - /mnt/c/Users/noede/Documents/Chainlink-HackFall22/.chainlink-goerli/chainlink-volume:/chainlink
+    command: node start --password /chainlink/password.txt --api /chainlink/apicredentials.txt
