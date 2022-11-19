@@ -1,0 +1,38 @@
+type = "directrequest"
+schemaVersion = 1
+name = "multi-res (TOML)"
+contractAddress = "0x915dc8cbcf3F17faa33F20B88e6d5D162195E0b2"
+maxTaskDuration = "0s"
+observationSource = """
+       decode_log   [type="ethabidecodelog"
+                  abi="OracleRequest(bytes32 indexed specId, address requester, bytes32 requestId, uint256 payment, address callbackAddr, bytes4 callbackFunctionId, uint256 cancelExpiration, uint256 dataVersion, bytes data)"
+                  data="$(jobRun.logData)"
+                  topics="$(jobRun.logTopics)"]
+
+                  
+    decode_cbor  [type="cborparse" data="$(decode_log.data)"]
+    decode_log -> decode_cbor
+    decode_cbor -> home
+    decode_cbor -> away
+    home          [type="http" method=GET url="$(decode_cbor.urlRESULT)" allowunrestrictednetworkaccess="true"]
+    home_parse    [type="jsonparse" path="$(decode_cbor.pathHOME)" data="$(home)"]
+    home -> home_parse
+    away          [type="http" method=GET url="$(decode_cbor.urlRESULT)" allowunrestrictednetworkaccess="true"]
+    away_parse    [type="jsonparse" path="$(decode_cbor.pathAWAY)" data="$(away)"]
+    away -> away_parse
+
+    home_parse -> encode_mwr
+    away_parse -> encode_mwr
+    // MWR API does NOT auto populate the requestID.
+    encode_mwr [type="ethabiencode"
+                abi="(bytes32 requestId, uint256 _home, uint256 _away)"
+                data="{\\"requestId\\": $(decode_log.requestId), \\"_home\\": $(home_parse), \\"_away\\": $(away_parse)}"
+                ]
+    encode_tx  [type="ethabiencode"
+                abi="fulfillOracleRequest2(bytes32 requestId, uint256 payment, address callbackAddress, bytes4 callbackFunctionId, uint256 expiration, bytes calldata data)"
+                data="{\\"requestId\\": $(decode_log.requestId), \\"payment\\":   $(decode_log.payment), \\"callbackAddress\\": $(decode_log.callbackAddr), \\"callbackFunctionId\\": $(decode_log.callbackFunctionId), \\"expiration\\": $(decode_log.cancelExpiration), \\"data\\": $(encode_mwr)}"
+                ]
+    submit_tx  [type="ethtx" to="0x915dc8cbcf3F17faa33F20B88e6d5D162195E0b2" data="$(encode_tx)"]
+    encode_mwr -> encode_tx -> submit_tx
+"""
+externalJobID = "fa38023e-44a8-4b63-84c9-411401904997"
